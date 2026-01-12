@@ -51,7 +51,7 @@ public class Terminal {
                     break;
 
                 case "echo":
-                    atual.echoIncremento(comandos[1], , comandos[2]);
+                    atual.echo(comandos[1],comandos[2], comandos[3]);
                     break;
 
                 case "cat":

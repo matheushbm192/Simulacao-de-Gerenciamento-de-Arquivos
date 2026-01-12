@@ -16,6 +16,12 @@ public class Arquivo implements Comandos {
     private boolean escrita;
     private boolean execucao;
     private String proprietario;
+
+    //todo: arrumar o construtor pois em sua criação ele precisa ter mais informações
+    public Arquivo(String nome) {
+        this.nome = nome;
+    }
+
     public String getNome() {
         return nome;
     }
@@ -120,26 +126,19 @@ public class Arquivo implements Comandos {
         this.proprietario = proprietario;
     }
 
-    //todo: não gostei dessa implementação, implementar a separação de linha  fuuramente
+    //todo: não gostei dessa implementação, implementar a separação de linha  futuramente
     public void textoIncrement(String textoIncrement){
         texto.concat(textoIncrement);
     }
 
-
-    private String prprietario;
-
-    //todo: arrumar o construtor pois em sua criação ele precisa ter mais informações
-    public Arquivo(String nome) {
-        this.nome = nome;
-    }
-
     public void escrever(String texto) {
-        this.conteudo = texto;
+        this.texto = texto;
         this.dataUltimaModificacao = new Date();
     }
 
     @Override
     public void mkdir(String nomeDiretorio) {
+        System.out.println("Erro: arquivo não pode conter diretórios.");
     }
 
     @Override
@@ -154,7 +153,7 @@ public class Arquivo implements Comandos {
 
     @Override
     public void echo(String texto, String atributo, String nomeArquivo) {
-
+        System.out.println("Erro: echo deve ser executado em um diretório.");
     }
 
     @Override
