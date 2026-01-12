@@ -177,5 +177,29 @@ public class Diretorio  implements Comandos {
         }
     }
 
+    @Override
+    public void head(String nomeArquivo, String numeroDeLinhas) {
+        Comandos diretorioArquivo = buscarDiretorioArquivo(nomeArquivo);
+        if(diretorioArquivo instanceof Arquivo arquivo){
+            arquivo.head(nomeArquivo,numeroDeLinhas);
+        }
+    }
+
+    @Override
+    public void tail(String nomeArquivo, String numeroDeLinhas) {
+        Comandos diretorioArquivo = buscarDiretorioArquivo(nomeArquivo);
+        if(diretorioArquivo instanceof Arquivo arquivo){
+            arquivo.tail(nomeArquivo,numeroDeLinhas);
+        }
+    }
+
+    @Override
+    public void wc(String nomeArquivo) {
+        Comandos diretorioArquivo = buscarDiretorioArquivo(nomeArquivo);
+        if(diretorioArquivo instanceof Arquivo arquivo){
+            arquivo.wc(nomeArquivo);
+        }
+    }
+
 
 }

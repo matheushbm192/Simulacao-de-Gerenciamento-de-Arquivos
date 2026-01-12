@@ -9,4 +9,7 @@ public interface Comandos {
     void echo(String texto,String atributo, String nomeArquivo);
     void cat(String nomeArquivo);
     void rm(String nomeDiretorioArquivo);
+    void head(String nomeArquivo, String numeroDeLinhas);
+    void tail(String nomeArquivo, String numeroDeLinhas);
+    void wc(String nomeArquivo);
 }
