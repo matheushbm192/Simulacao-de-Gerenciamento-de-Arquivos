@@ -7,22 +7,22 @@ import java.util.Scanner;
 public class Terminal {
     public static void main(String[] args) {
 
+        Scanner entrada = new Scanner(System.in);
+
         ArrayList<Comandos> caminho = new ArrayList<>();
         ArrayList<String> historico = new ArrayList<>();
 
-        Comandos root = new Diretorio("C:");
-
-        caminho.add(root);
         Comandos atual;
+        Comandos root = new Diretorio("C:");
+        caminho.add(root);
         atual = root;
 
-        Scanner entrada = new Scanner(System.in);
-
         while (true){
-
             String comando = entrada.nextLine();
 
-            //analisar essa divisão
+            //mantém historico de comandos digitados
+            historico.add(comando);
+
             String[] comandos = comando.split(" ");
 
             switch (comandos[0]){
@@ -38,12 +38,33 @@ public class Terminal {
                     System.out.println("Encerrando terminal");
                     return;
 
-                case "touch":
+                    case "touch":
                     atual.touch(comandos[1]);
                     break;
 
-                default:
+                case "rmdir":
+                    atual.rmdir(comandos[1]);
+                    break;
+
+                case "rename":
+                    atual.rename(comandos[1],comandos[2]);
+                    break;
+
+                case "echo":
+                    atual.echoIncremento(comandos[1], , comandos[2]);
+                    break;
+
+                case "cat":
+                    atual.cat(comandos[1]);
+                    break;
+
+                case "rm":
+                    atual.rm(comandos[1]);
+                    break;
+
+                    default:
                     System.out.println("Comando inválido");
+                    break;
             }
         }
     }

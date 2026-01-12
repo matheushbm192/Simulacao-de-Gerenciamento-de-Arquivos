@@ -1,9 +1,13 @@
 package org.example;
 
 public interface Comandos {
-    // implementar todos os métodos
     void mkdir(String nomeDiretorio);
     void tree();
     void touch(String nomeArquivo);
 
+    void rmdir(String nomeDiretorio);
+    void rename (String nomeDiretorioArquivo, String novoNomeDiretorioArquivo);
+    void echo(String texto,String atributo, String nomeArquivo);
+    void cat(String nomeArquivo);
+    void rm(String nomeDiretorioArquivo);
 }
