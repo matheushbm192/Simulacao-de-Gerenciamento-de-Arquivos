@@ -121,8 +121,32 @@ public class Arquivo implements Comandos {
     }
 
     //todo: não gostei dessa implementação, implementar a separação de linha  fuuramente
-    public void textoIncrement(String textoIncrement){
-        texto.concat(textoIncrement);
+    public void textoIncrement(String textoIncrement) {
+        StringBuilder textoAdicional = new StringBuilder();
+        textoAdicional.append(" ").append(textoIncrement);
+       texto += textoAdicional.toString() ;
+
+    }
+
+    private String adicionaQuebraLinha(String textoPuro) {
+
+        String[] palavras = textoPuro.split(" ");
+        StringBuilder textoTratado = new StringBuilder();
+
+        int palavrasPorLinha = 4;
+        int contador = 0;
+
+        for (String palavra : palavras) {
+            textoTratado.append(palavra).append(" ");
+            contador++;
+
+            if (contador == palavrasPorLinha) {
+                textoTratado.append("\n");
+                contador = 0;
+            }
+        }
+
+        return textoTratado.toString();
     }
 
 
@@ -134,7 +158,7 @@ public class Arquivo implements Comandos {
     }
 
     public void escrever(String texto) {
-        this.conteudo = texto;
+        this.texto = texto;
         this.dataUltimaModificacao = new Date();
     }
 
@@ -176,5 +200,78 @@ public class Arquivo implements Comandos {
     @Override
     public void touch(String nomeArquivo) {
         System.out.println("Erro: não é possível criar arquivo dentro de um arquivo.");
+    }
+
+    @Override
+    public void head(String nomeArquivo, String numeroDeLinhas) throws RuntimeException {
+        int numeroDeLinhasConvert;
+        String textoComQuebraLinha = adicionaQuebraLinha(texto);
+        String[] textoSeparadoPorLinha = textoComQuebraLinha.split("\n");
+        int quantidadeLinhas = textoSeparadoPorLinha.length;
+
+        try{
+            numeroDeLinhasConvert = Integer.parseInt(numeroDeLinhas);
+
+        } catch (RuntimeException e) {
+            throw new RuntimeException("O valor de linhas informado não é um número!");
+        }
+
+        if(numeroDeLinhasConvert <= quantidadeLinhas){
+            for (int i = 0; i < numeroDeLinhasConvert; i++) {
+                System.out.println(textoSeparadoPorLinha[i]);
+            }
+
+        }else {
+            throw new RuntimeException("Número de linhas informado é superior ao numero de linhas do arquivo!");
+        }
+    }
+
+    @Override
+    public void tail(String nomeArquivo, String numeroDeLinhas) {
+        int numeroDeLinhasConvert;
+        String textoComQuebraLinha = adicionaQuebraLinha(texto);
+        String[] textoSeparadoPorLinha = textoComQuebraLinha.split("\n");
+        int quantidadeLinhas = textoSeparadoPorLinha.length;
+
+        try{
+            numeroDeLinhasConvert = Integer.parseInt(numeroDeLinhas);
+
+        } catch (RuntimeException e) {
+            throw new RuntimeException("O valor de linhas informado não é um número!");
+        }
+
+        if(numeroDeLinhasConvert <= quantidadeLinhas){
+            int linhaInicial = quantidadeLinhas - numeroDeLinhasConvert;
+            for (int i = linhaInicial; i <= quantidadeLinhas; i++) {
+                System.out.println(textoSeparadoPorLinha[i]);
+            }
+
+        }else {
+            throw new RuntimeException("Número de linhas informado é superior ao numero de linhas do arquivo!");
+        }
+    }
+
+    @Override
+    public void wc(String nomeArquivo) {
+        System.out.println("linhas: " +countLinhas());
+        System.out.println("palavras: " + countPalavras());
+        System.out.println("caracteres: " + countCaracteres());
+
+    }
+
+    private int countLinhas(){
+        String textoComQuebraLinha = adicionaQuebraLinha(texto);
+        String[] textoSeparadoPorLinha = textoComQuebraLinha.split("\n");
+        return textoSeparadoPorLinha.length;
+    }
+
+    private int countPalavras(){
+        String[] palavras = texto.split(" ");
+        return palavras.length;
+    }
+
+    private int countCaracteres(){
+        String[] caracteres = texto.split("");
+        return caracteres.length;
     }
 }

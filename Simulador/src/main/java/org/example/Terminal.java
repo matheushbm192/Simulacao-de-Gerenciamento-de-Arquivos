@@ -14,10 +14,12 @@ public class Terminal {
 
         Comandos atual;
         Comandos root = new Diretorio("C:");
+
         caminho.add(root);
         atual = root;
 
         while (true){
+
             String comando = entrada.nextLine();
 
             //mantém historico de comandos digitados
@@ -45,21 +47,26 @@ public class Terminal {
                 case "rmdir":
                     atual.rmdir(comandos[1]);
                     break;
-
                 case "rename":
                     atual.rename(comandos[1],comandos[2]);
                     break;
-
                 case "echo":
-                    atual.echoIncremento(comandos[1], , comandos[2]);
+                    atual.echo(comandos[1],comandos[2],comandos[3]);
                     break;
-
                 case "cat":
                     atual.cat(comandos[1]);
                     break;
-
                 case "rm":
                     atual.rm(comandos[1]);
+                    break;
+                case "head":
+                    atual.head(comandos[1],comandos[2]);
+                    break;
+                case "tail":
+                    atual.tail(comandos[1],comandos[2]);
+                    break;
+                case "wc":
+                    atual.wc(comandos[1]);
                     break;
 
                     default:
