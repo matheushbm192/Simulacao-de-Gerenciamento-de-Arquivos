@@ -7,22 +7,43 @@ import java.util.Scanner;
 public class Terminal {
     public static void main(String[] args) {
 
+        ArrayList<Comandos> caminho = new ArrayList<>();
         ArrayList<String> historico = new ArrayList<>();
 
         Comandos root = new Diretorio("C:");
-        ArrayList<Comandos> caminho = new ArrayList<>();
+
         caminho.add(root);
         Comandos atual;
         atual = root;
+
+        Scanner entrada = new Scanner(System.in);
+
         while (true){
-            Scanner entrada = new Scanner(System.in);
+
             String comando = entrada.nextLine();
+
+            //analisar essa divisão
             String[] comandos = comando.split(" ");
+
             switch (comandos[0]){
                 case "mkdir":
                     atual.mkdir(comandos[1]);
-                break;
-                //TODO: adicionar demais comandos abaixo
+                    break;
+
+                case "tree":
+                    atual.tree();
+                    break;
+
+                case "exit":
+                    System.out.println("Encerrando terminal");
+                    return;
+
+                case "touch":
+                    atual.touch(comandos[1]);
+                    break;
+
+                default:
+                    System.out.println("Comando inválido");
             }
         }
     }
