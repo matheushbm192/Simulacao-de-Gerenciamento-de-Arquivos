@@ -30,6 +30,11 @@ public class Diretorio  implements Comandos {
         this.nome = nome;
     }
 
+    @Override
+    public ArrayList<Comandos> getFilhos(){
+        return diretoriosArquivos;
+    }
+
     public String getTipo() {
         return tipo;
     }
@@ -118,6 +123,7 @@ public class Diretorio  implements Comandos {
         }
         return null;
     }
+
 
     @Override
     public void mkdir(String nomeDiretorio){

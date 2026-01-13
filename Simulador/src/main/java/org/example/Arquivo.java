@@ -1,5 +1,6 @@
 package org.example;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 public class Arquivo implements Comandos {
@@ -22,6 +23,12 @@ public class Arquivo implements Comandos {
 
     public void setNome(String nome) {
         this.nome = nome;
+    }
+
+    @Override
+    public ArrayList<Comandos> getFilhos() {
+        //todo: ou return null?
+        return new ArrayList<>();
     }
 
     public String getTipo() {

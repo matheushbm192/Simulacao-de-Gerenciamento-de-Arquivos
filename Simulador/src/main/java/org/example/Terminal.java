@@ -68,6 +68,39 @@ public class Terminal {
                 case "wc":
                     atual.wc(comandos[1]);
                     break;
+                case "cd":
+                    if(comandos.length==2){
+                        if(comandos[1].equals("..")){
+
+                            //cd..
+                            if(caminho.size() > 1){
+                                caminho.remove(caminho.size()-1);
+                                atual = caminho.get(caminho.size()-1);
+
+                            }else if (comandos[1].equals("/")){
+                                //cd /
+                                caminho.clear();
+                                caminho.add(root);
+                                atual = root;
+
+                            }else{
+                                //cd <nome>
+                                boolean encontrado = false;
+                                for(Comandos c : atual.getFilhos()){
+                                    if(c instanceof Diretorio && c.getNome().equals(comandos[1])){
+                                        atual = c;
+                                        caminho.add(atual);
+                                        encontrado = true;
+                                        break;
+                                    }
+                                }
+                                if(!encontrado){
+                                    System.out.println("Diretório não encontrado. ");
+                                }
+                            }
+                        }
+                    }
+                    break;
 
                     default:
                     System.out.println("Comando inválido");

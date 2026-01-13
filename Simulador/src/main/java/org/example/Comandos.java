@@ -1,5 +1,7 @@
 package org.example;
 
+import java.util.ArrayList;
+
 public interface Comandos {
     void mkdir(String nomeDiretorio);
     void tree();
@@ -14,4 +16,5 @@ public interface Comandos {
     void wc(String nomeArquivo);
     String getNome();
     void setNome(String nome);
+    ArrayList<Comandos> getFilhos();
 }
