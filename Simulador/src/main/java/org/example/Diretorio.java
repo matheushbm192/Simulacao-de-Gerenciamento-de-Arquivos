@@ -134,6 +134,7 @@ public class Diretorio  implements Comandos {
     public void tree() {
         //this == atual (terminal)
         imprimirTree(this, 0);
+
     }
 
     @Override
@@ -187,8 +188,18 @@ public class Diretorio  implements Comandos {
                 arquivo.textoIncrement(texto);
             }else if(">".equals(atributo)){
                 //todo: codigo paola
+                //procurar arquivo
+                for (Comandos c : diretoriosArquivos) {
+                    if (c instanceof Arquivo && c.getNome().equals(nomeArquivo)) {
+                        ((Arquivo) c).escrever(texto);
+                        return;
+                    }
+                }
+                //se não existir, cria
+                Arquivo novo = new Arquivo(nomeArquivo);
+                novo.escrever(texto);
+                diretoriosArquivos.add(novo);
             }
-
         }
     }
 
