@@ -77,7 +77,7 @@ public class Terminal {
                                 caminho.remove(caminho.size()-1);
                                 atual = caminho.get(caminho.size()-1);
 
-                            }else if (comandos[1].equals("/")){
+                            }else if ("/".equals(comandos[1])){
                                 //cd /
                                 caminho.clear();
                                 caminho.add(root);

@@ -186,20 +186,16 @@ public class Diretorio  implements Comandos {
         if(diretorioArquivo instanceof Arquivo arquivo){
             if (">>".equals(atributo)){
                 arquivo.textoIncrement(texto);
+
             }else if(">".equals(atributo)){
-                //todo: codigo paola
-                //procurar arquivo
-                for (Comandos c : diretoriosArquivos) {
-                    if (c instanceof Arquivo && c.getNome().equals(nomeArquivo)) {
-                        ((Arquivo) c).escrever(texto);
-                        return;
-                    }
-                }
-                //se não existir, cria
-                Arquivo novo = new Arquivo(nomeArquivo);
-                novo.escrever(texto);
-                diretoriosArquivos.add(novo);
+                arquivo.escrever(texto);
+
             }
+        }else{
+            //se não existir, cria
+            Arquivo novo = new Arquivo(nomeArquivo);
+            novo.escrever(texto);
+            diretoriosArquivos.add(novo);
         }
     }
 
