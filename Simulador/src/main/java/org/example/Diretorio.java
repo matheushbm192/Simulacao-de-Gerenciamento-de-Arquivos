@@ -152,6 +152,13 @@ public class Diretorio  implements Comandos {
         System.out.println("|-- " + dir.nome);
 
         for (Comandos c : dir.diretoriosArquivos) {
+
+            for (int i = 0; i <= nivel; i++) {
+                System.out.print("   ");
+            }
+
+            System.out.println("|-- " + c.getNome());
+
             if (c instanceof Diretorio) {
                 imprimirTree((Diretorio) c, nivel + 1);
             }
@@ -204,7 +211,7 @@ public class Diretorio  implements Comandos {
         Comandos diretorioArquivo = buscarDiretorioArquivo(nomeArquivo);
 
         if (diretorioArquivo instanceof Arquivo arquivo){
-            System.out.println(arquivo.getNome());
+            arquivo.cat();
         }
     }
 
@@ -212,10 +219,16 @@ public class Diretorio  implements Comandos {
     public void rm(String nomeDiretorioArquivo) {
         Comandos diretorioArquivo = buscarDiretorioArquivo(nomeDiretorioArquivo);
 
-        if(diretorioArquivo != null){
-                diretoriosArquivos.remove(diretorioArquivo);
-
+        if (diretorioArquivo instanceof Diretorio dir) {
+            if (dir.getFilhos().isEmpty()) {
+                diretoriosArquivos.remove(dir);
+            } else {
+                System.out.println("rm: diretório não está vazio");
+            }
+        } else if (diretorioArquivo != null) {
+            diretoriosArquivos.remove(diretorioArquivo);
         }
+
     }
 
     @Override
@@ -264,6 +277,37 @@ public class Diretorio  implements Comandos {
             );
         }
     }
+
+    public void setPermissoes(String permissao) {
+        leitura = permissao.contains("r");
+        escrita = permissao.contains("w");
+        execucao = permissao.contains("x");
+    }
+
+    public String detalhes() {
+
+        String tipo = "d";
+        String permissoes =
+                (leitura ? "r" : "-") +
+                        (escrita ? "w" : "-") +
+                        (execucao ? "x" : "-");
+
+        return String.format(
+                "%s%s  %s  %d  %s",
+                tipo,
+                permissoes,
+                proprietario,
+                diretoriosArquivos.size(),
+                nome
+        );
+    }
+
+    // todo: usar esse método depois onde os comandos são inválidos para diretório, vai facilitar
+    private void comandoInvalido(String comando) {
+        System.out.println(comando + ": operação inválida para diretório");
+    }
+
+
 
 
 

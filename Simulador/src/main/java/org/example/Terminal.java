@@ -137,6 +137,81 @@ public class Terminal {
                     }
                     break;
 
+                case "chmod":
+                    if (comandos.length == 3) {
+
+                        String permissao = comandos[1];
+                        String nome = comandos[2];
+
+                        boolean encontrado = false;
+
+                        for (Comandos c : atual.getFilhos()) {
+
+                            if (c.getNome().equals(nome)) {
+
+                                if (c instanceof Arquivo) {
+                                    ((Arquivo) c).setPermissoes(permissao);
+                                } else if (c instanceof Diretorio) {
+                                    ((Diretorio) c).setPermissoes(permissao);
+                                }
+
+                                encontrado = true;
+                                break;
+                            }
+                        }
+
+                        if (!encontrado) {
+                            System.out.println("Arquivo ou diretório não encontrado.");
+                        }
+
+                    }
+                    break;
+
+                case "chown":
+                    if (comandos.length == 3) {
+
+                        String novoProprietario = comandos[1];
+                        String nome = comandos[2];
+
+                        boolean encontrado = false;
+
+                        for (Comandos c : atual.getFilhos()) {
+
+                            if (c.getNome().equals(nome)) {
+
+                                if (c instanceof Arquivo) {
+                                    ((Arquivo) c).setProprietario(novoProprietario);
+                                } else if (c instanceof Diretorio) {
+                                    ((Diretorio) c).setProprietario(novoProprietario);
+                                }
+
+                                encontrado = true;
+                                break;
+                            }
+                        }
+
+                        if (!encontrado) {
+                            System.out.println("Arquivo ou diretório não encontrado.");
+                        }
+
+                    }
+                    break;
+
+                case "ls":
+                    if (comandos.length == 2 && comandos[1].equals("-l")) {
+
+                        for (Comandos c : atual.getFilhos()) {
+
+                            if (c instanceof Arquivo) {
+                                System.out.println(((Arquivo) c).detalhes());
+                            } else if (c instanceof Diretorio) {
+                                System.out.println(((Diretorio) c).detalhes());
+                            }
+                        }
+
+                    }
+                    break;
+
 
                 default:
                     System.out.println("Comando inválido");

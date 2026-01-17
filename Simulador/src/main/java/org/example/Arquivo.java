@@ -17,10 +17,12 @@ public class Arquivo implements Comandos {
     private boolean escrita;
     private boolean execucao;
     private String proprietario;
+    private int tamanhoBytes = (texto == null) ? 0 : texto.length();
 
     //todo: arrumar o construtor pois em sua criação ele precisa ter mais informações
     public Arquivo(String nome) {
         this.nome = nome;
+        this.texto = "";
     }
 
     public String getNome() {
@@ -33,8 +35,7 @@ public class Arquivo implements Comandos {
 
     @Override
     public ArrayList<Comandos> getFilhos() {
-        //todo: ou return null?
-        return new ArrayList<>();
+        return null;
     }
 
     public String getTipo() {
@@ -133,6 +134,7 @@ public class Arquivo implements Comandos {
         this.proprietario = proprietario;
     }
 
+
     //todo: não gostei dessa implementação, implementar a separação de linha  fuuramente
     public void textoIncrement(String textoIncrement) {
         StringBuilder textoAdicional = new StringBuilder();
@@ -174,11 +176,13 @@ public class Arquivo implements Comandos {
 
     @Override
     public void rmdir(String nomeDiretorio) {
+        comandoInvalido("rmdir");
 
     }
 
     @Override
     public void rename(String nomeDiretorioArquivo, String novoNomeDiretorioArquivo) {
+        comandoInvalido("rename");
 
     }
 
@@ -189,12 +193,12 @@ public class Arquivo implements Comandos {
 
     @Override
     public void cat(String nomeArquivo) {
-
+        System.out.println(texto);
     }
 
     @Override
     public void rm(String nomeDiretorioArquivo) {
-
+        comandoInvalido("rm");
     }
 
     @Override
@@ -248,7 +252,7 @@ public class Arquivo implements Comandos {
 
         if(numeroDeLinhasConvert <= quantidadeLinhas){
             int linhaInicial = quantidadeLinhas - numeroDeLinhasConvert;
-            for (int i = linhaInicial; i <= quantidadeLinhas; i++) {
+            for (int i = linhaInicial; i < quantidadeLinhas; i++) {
                 System.out.println(textoSeparadoPorLinha[i]);
             }
 
@@ -263,6 +267,12 @@ public class Arquivo implements Comandos {
         System.out.println("palavras: " + countPalavras());
         System.out.println("caracteres: " + countCaracteres());
 
+    }
+
+    public void setPermissoes(String permissao) {
+        leitura = permissao.contains("r");
+        escrita = permissao.contains("w");
+        execucao = permissao.contains("x");
     }
 
     private int countLinhas(){
@@ -290,6 +300,11 @@ public class Arquivo implements Comandos {
     // todo: criar para diretório também? mesmo que seja inválido?
     public void grep(String termo) {
 
+        if (!leitura) {
+            System.out.println("Permissão negada: leitura.");
+            return;
+        }
+
         if (texto.isEmpty()) {
             return;
         }
@@ -303,6 +318,29 @@ public class Arquivo implements Comandos {
                 );
             }
         }
+    }
+
+    public String detalhes() {
+
+        String tipo = "-";
+        String permissoes =
+                (leitura ? "r" : "-") +
+                        (escrita ? "w" : "-") +
+                        (execucao ? "x" : "-");
+
+        return String.format(
+                "%s%s  %s  %d  %s",
+                tipo,
+                permissoes,
+                proprietario,
+                (int) tamanhoBytes,
+                nome
+        );
+    }
+
+    // todo: usar esse método depois onde os comandos são inválidos para arquivo, vai facilitar
+    private void comandoInvalido(String comando) {
+        System.out.println(comando + ": operação inválida para arquivo");
     }
 
 
