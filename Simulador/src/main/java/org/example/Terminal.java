@@ -102,7 +102,43 @@ public class Terminal {
                     }
                     break;
 
-                    default:
+                case "find":
+                    if (comandos.length == 4 && comandos[2].equals("-name")) {
+
+                        if (comandos[1].equals(atual.getNome())) {
+                            ((Diretorio) atual).find(comandos[3]);
+                        } else {
+                            System.out.println("Diretório inicial inválido.");
+                        }
+
+                    }
+                    break;
+
+                case "grep":
+                    if (comandos.length == 3) {
+
+                        String termo = comandos[1];
+                        String nomeArquivo = comandos[2];
+
+                        boolean encontrado = false;
+
+                        for (Comandos c : atual.getFilhos()) {
+                            if (c instanceof Arquivo && c.getNome().equals(nomeArquivo)) {
+                                ((Arquivo) c).grep(termo);
+                                encontrado = true;
+                                break;
+                            }
+                        }
+
+                        if (!encontrado) {
+                            System.out.println("Arquivo não encontrado.");
+                        }
+
+                    }
+                    break;
+
+
+                default:
                     System.out.println("Comando inválido");
                     break;
             }

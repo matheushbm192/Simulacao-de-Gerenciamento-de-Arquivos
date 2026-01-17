@@ -17,5 +17,6 @@ public interface Comandos {
     String getNome();
     void setNome(String nome);
     ArrayList<Comandos> getFilhos();
+    void find (String  nomeProcurado);
 
 }

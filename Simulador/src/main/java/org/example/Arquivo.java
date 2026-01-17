@@ -280,4 +280,30 @@ public class Arquivo implements Comandos {
         String[] caracteres = texto.split("");
         return caracteres.length;
     }
+
+    @Override
+    public void find(String nomeProcurado) {
+        // arquivo não inicia busca
+        System.out.println("Erro: find deve ser executado em um diretório.");
+    }
+
+    // todo: criar para diretório também? mesmo que seja inválido?
+    public void grep(String termo) {
+
+        if (texto.isEmpty()) {
+            return;
+        }
+
+        String[] linhas = texto.split("\n");
+
+        for (int i = 0; i < linhas.length; i++) {
+            if (linhas[i].contains(termo)) {
+                System.out.println(
+                        getNome() + ":" + (i + 1) + ": " + linhas[i]
+                );
+            }
+        }
+    }
+
+
 }

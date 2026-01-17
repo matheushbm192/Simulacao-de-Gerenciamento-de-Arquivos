@@ -242,5 +242,29 @@ public class Diretorio  implements Comandos {
         }
     }
 
+    @Override
+    public void find(String nomeProcurado) {
+        buscarRecursivo(this, nomeProcurado, this.getNome());
+    }
+
+    private void buscarRecursivo(
+            Comandos atual,
+            String nomeProcurado,
+            String caminhoAtual
+    ) {
+        if (atual.getNome().equals(nomeProcurado)) {
+            System.out.println(caminhoAtual);
+        }
+
+        for (Comandos c : atual.getFilhos()) {
+            buscarRecursivo(
+                    c,
+                    nomeProcurado,
+                    caminhoAtual + "\\" + c.getNome()
+            );
+        }
+    }
+
+
 
 }
