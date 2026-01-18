@@ -6,7 +6,6 @@ import java.util.Date;
 public class Diretorio  implements Comandos {
     private String nome;
     private String tipo;
-    private double tamanho;
     private double tamanhoBytes;
     private Date dataCriacao;
     private Date dataUltimaModificacao;
@@ -14,12 +13,19 @@ public class Diretorio  implements Comandos {
     private boolean escrita;
     private boolean execucao;
     private String proprietario;
-
-    //uma árvore (temos que criar todas as estruturas de árvores)
+    private String caminho;
+    private long inode;
+    private String grupo;
+    private String permissoesOctal;   // ex: 0644
+    private String permissoesSimbolicas; // ex: -rw-r--r--
+    private Date dataUltimoAcesso;
+    private Date dataAlteracaoMetadados;
+    private final int bloco = 512;
     private ArrayList<Comandos> diretoriosArquivos = new ArrayList<>();
 
-    public Diretorio(String nomeDiretorio){
+    public Diretorio(String nomeDiretorio,int inode){
         this.nome = nomeDiretorio;
+        this.inode = inode;
     }
 
     public String getNome() {
@@ -43,22 +49,19 @@ public class Diretorio  implements Comandos {
         this.tipo = tipo;
     }
 
-    public double getTamanho() {
-        return tamanho;
-    }
-
-    public void setTamanho(double tamanho) {
-        this.tamanho = tamanho;
-    }
-
     public double getTamanhoBytes() {
-        return tamanhoBytes;
+        double total = 0;
+
+        for (Comandos diretorioArquivo : diretoriosArquivos) {
+            total += diretorioArquivo.getTamanhoBytes();
+        }
+
+        return total;
     }
 
-    public void setTamanhoBytes(double tamanhoBytes) {
-        this.tamanhoBytes = tamanhoBytes;
-    }
+    private void setTamanhoBytes(){
 
+    }
     public Date getDataCriacao() {
         return dataCriacao;
     }
@@ -126,8 +129,8 @@ public class Diretorio  implements Comandos {
 
 
     @Override
-    public void mkdir(String nomeDiretorio){
-        diretoriosArquivos.add(new Diretorio(nomeDiretorio));
+    public void mkdir(String nomeDiretorio,int inode){
+        diretoriosArquivos.add(new Diretorio(nomeDiretorio,inode));
     }
 
     @Override
@@ -138,8 +141,8 @@ public class Diretorio  implements Comandos {
     }
 
     @Override
-    public void touch(String nomeArquivo) {
-        diretoriosArquivos.add(new Arquivo(nomeArquivo));
+    public void touch(String nomeArquivo, int inode) {
+        diretoriosArquivos.add(new Arquivo(nomeArquivo,inode));
     }
 
     private void imprimirTree(Diretorio dir, int nivel) {
@@ -187,7 +190,7 @@ public class Diretorio  implements Comandos {
 
     //todo:rever implemntação
     @Override
-    public void echo(String texto, String atributo, String nomeArquivo) {
+    public void echo(String texto, String atributo, String nomeArquivo,int inode) {
         Comandos diretorioArquivo = buscarDiretorioArquivo(nomeArquivo);
 
         if(diretorioArquivo instanceof Arquivo arquivo){
@@ -200,7 +203,7 @@ public class Diretorio  implements Comandos {
             }
         }else{
             //se não existir, cria
-            Arquivo novo = new Arquivo(nomeArquivo);
+            Arquivo novo = new Arquivo(nomeArquivo,inode);
             novo.escrever(texto);
             diretoriosArquivos.add(novo);
         }
@@ -256,12 +259,49 @@ public class Diretorio  implements Comandos {
     }
 
     @Override
-    public void find(String nomeProcurado) {
-        buscarRecursivo(this, nomeProcurado, this.getNome());
+    public void find(String nomeDiretorioArquivo) {
+        buscarRecursivo(this, nomeDiretorioArquivo, this.getNome());
     }
 
     @Override
     public void grep(String termo) {
+
+    }
+
+    @Override
+    public void stat(String nomeDiretorioArquivo) {
+        Diretorio diretorio;
+        if(this.nome.equals(nomeDiretorioArquivo)){
+            diretorio = this;
+        }else{
+            Comandos diretorioArquivo = buscarDiretorioArquivo(nomeDiretorioArquivo);
+            if (diretorioArquivo instanceof Diretorio){
+                diretorio = (Diretorio) diretorioArquivo;
+            }else if(diretorioArquivo instanceof Arquivo arquivo){
+                arquivo.stat(nomeDiretorioArquivo);
+                return;
+            }else {
+                System.out.println("O arquivo | diretorio não foi encontrado!");
+                return;
+            }
+            printStat();
+
+        }
+
+
+    }
+
+    @Override
+    public void du(String nomeDiretorio) {
+        Comandos diretorioArquivo = buscarDiretorioArquivo(nomeDiretorio);
+        if(diretorioArquivo instanceof Diretorio){
+            int quantidadeBlocos = (int) getTamanhoBytes() / bloco;
+            System.out.println(quantidadeBlocos + "/"+nomeDiretorio);
+        } else if (diretorioArquivo instanceof Arquivo arquivo) {
+            arquivo.du(nomeDiretorio);
+        }else{
+            System.out.println("Diretorio não foi encontrado");
+        }
 
     }
 
@@ -275,11 +315,38 @@ public class Diretorio  implements Comandos {
         }
     }
 
-    public void setPermissoes(String permissao) {
-        leitura = permissao.contains("r");
-        escrita = permissao.contains("w");
-        execucao = permissao.contains("x");
+    //todo: setPermissoes precisa definir as permissoes em octal tambem
+    public void setPermissoes(String permissaoSimbolica) {
+
+        // Exemplo esperado: drwxr-xr-x
+        this.permissoesSimbolicas = permissaoSimbolica;
+
+        // Remove o tipo (d, -, l)
+        String perms = permissaoSimbolica.substring(1);
+
+        int dono = calcularValor(perms.substring(0, 3));
+        int grupo = calcularValor(perms.substring(3, 6));
+        int outros = calcularValor(perms.substring(6, 9));
+        this.grupo = perms.substring(3, 6);
+        this.permissoesOctal = "0" + dono + grupo + outros;
+
+
+        this.leitura = perms.charAt(0) == 'r';
+        this.escrita = perms.charAt(1) == 'w';
+        this.execucao = perms.charAt(2) == 'x';
     }
+
+    // Converte rwx → número (4,2,1)
+    private int calcularValor(String permissao) {
+        int valor = 0;
+
+        if (permissao.charAt(0) == 'r') valor += 4;
+        if (permissao.charAt(1) == 'w') valor += 2;
+        if (permissao.charAt(2) == 'x') valor += 1;
+
+        return valor;
+    }
+
 
     public String detalhes() {
 
@@ -305,6 +372,51 @@ public class Diretorio  implements Comandos {
     }
 
 
+
+
+    private void printStat() {
+    this.tamanhoBytes = getTamanhoBytes();
+        System.out.println("  Diretorio: " + nome);
+
+        System.out.printf(
+                "  Tamanho: %-15.0f Blocos: %-10d Bloco IO: %-6d %s%n",
+                tamanhoBytes,
+                (int) Math.ceil(tamanhoBytes / bloco),
+                4096,
+                tipo
+        );
+
+        System.out.printf(
+                " Inode: %-12d Links: %d%n",
+                inode,
+                diretoriosArquivos.size() + 2
+        );
+
+        //TODO: Ajustar Permissão
+        System.out.printf(
+                "Acesso: (%s/%s)  UID: (1000/%s)   GID: (1000/%s)%n",
+                permissoesOctal,
+                permissoesSimbolicas,
+                proprietario,
+                grupo
+        );
+
+        System.out.println(
+                "Acesso: " + dataUltimoAcesso
+        );
+
+        System.out.println(
+                "Modificação: " + dataUltimaModificacao
+        );
+
+        System.out.println(
+                "Alteração: " + dataAlteracaoMetadados
+        );
+
+        System.out.println(
+                " Criação: " + dataCriacao
+        );
+    }
 
 
 

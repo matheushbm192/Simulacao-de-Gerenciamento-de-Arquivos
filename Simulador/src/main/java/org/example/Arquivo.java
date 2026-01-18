@@ -6,7 +6,7 @@ import java.util.Date;
 public class Arquivo implements Comandos {
     private String nome;
     private String tipo;
-    private double tamanho;
+
     private Date dataCriacao;
     private Date dataUltimaModificacao;
     private String texto;
@@ -17,11 +17,18 @@ public class Arquivo implements Comandos {
     private boolean escrita;
     private boolean execucao;
     private String proprietario;
+    private long inode;
+    private String grupo;
+    private String permissoesOctal;   // ex: 0644
+    private String permissoesSimbolicas; // ex: -rw-r--r--
+    private Date dataUltimoAcesso;
+    private Date dataAlteracaoMetadados;
     private int tamanhoBytes = (texto == null) ? 0 : texto.length();
-
+    private final int bloco = 512;
     //todo: arrumar o construtor pois em sua criação ele precisa ter mais informações
-    public Arquivo(String nome) {
+    public Arquivo(String nome,int inode) {
         this.nome = nome;
+        this.inode = inode;
         this.texto = "";
     }
 
@@ -44,14 +51,6 @@ public class Arquivo implements Comandos {
 
     public void setTipo(String tipo) {
         this.tipo = tipo;
-    }
-
-    public double getTamanho() {
-        return tamanho;
-    }
-
-    public void setTamanho(double tamanho) {
-        this.tamanho = tamanho;
     }
 
     public Date getDataCriacao() {
@@ -170,7 +169,7 @@ public class Arquivo implements Comandos {
     }
 
     @Override
-    public void mkdir(String nomeDiretorio) {
+    public void mkdir(String nomeDiretorio,int inode) {
         System.out.println("Erro: arquivo não pode conter diretórios.");
     }
 
@@ -187,7 +186,7 @@ public class Arquivo implements Comandos {
     }
 
     @Override
-    public void echo(String texto, String atributo, String nomeArquivo) {
+    public void echo(String texto, String atributo, String nomeArquivo,int inode) {
         System.out.println("Erro: echo deve ser executado em um diretório.");
     }
 
@@ -208,7 +207,7 @@ public class Arquivo implements Comandos {
     }
 
     @Override
-    public void touch(String nomeArquivo) {
+    public void touch(String nomeArquivo, int inode) {
         System.out.println("Erro: não é possível criar arquivo dentro de um arquivo.");
     }
 
@@ -292,7 +291,7 @@ public class Arquivo implements Comandos {
     }
 
     @Override
-    public void find(String nomeProcurado) {
+    public void find(String nomeDiretorioArquivo) {
         // arquivo não inicia busca
         System.out.println("Erro: find deve ser executado em um diretório.");
     }
@@ -318,6 +317,65 @@ public class Arquivo implements Comandos {
                 );
             }
         }
+    }
+
+    @Override
+    public void stat(String nomeDiretorioArquivo) {
+        printStat();
+    }
+
+    @Override
+    public double getTamanhoBytes() {
+        return tamanhoBytes;
+    }
+
+    private void printStat() {
+
+        System.out.println("  Arquivo: " + nome);
+
+        System.out.printf(
+                "  Tamanho: %-15.0f Blocos: %-10d Bloco IO: %-6d %s%n",
+                tamanhoBytes,
+                (int) Math.ceil(tamanhoBytes / bloco),
+                4096,
+                tipo
+        );
+
+        System.out.printf(
+                "Dispositivo: %-15s Inode: %-12d Links: %d%n",
+                "802h/2050d",
+                inode,
+                1
+        );
+
+        //TODO: Ajustar Permissão
+        System.out.printf(
+                "Acesso: (%s/%s)  UID: (1000/%s)   GID: (1000/%s)%n",
+                permissoesOctal,
+                permissoesSimbolicas,
+                proprietario,
+                grupo
+        );
+
+        System.out.println(
+                "Acesso: " + dataUltimoAcesso
+        );
+
+        System.out.println(
+                "Modificação: " + dataUltimaModificacao
+        );
+
+        System.out.println(
+                "Alteração: " + dataAlteracaoMetadados
+        );
+
+        System.out.println(
+                " Criação: " + dataCriacao
+        );
+    }
+    @Override
+    public void du(String nomeDiretorio) {
+        System.out.println("Erro: du deve ser executado em um diretório.");
     }
 
     public String detalhes() {
