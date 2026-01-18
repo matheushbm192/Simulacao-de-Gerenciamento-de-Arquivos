@@ -11,9 +11,9 @@ public class Terminal {
 
         ArrayList<Comandos> caminho = new ArrayList<>();
         ArrayList<String> historico = new ArrayList<>();
-
+        int inode = 1;
         Comandos atual;
-        Comandos root = new Diretorio("C:");
+        Comandos root = new Diretorio("C:",inode);
 
         caminho.add(root);
         atual = root;
@@ -30,7 +30,8 @@ public class Terminal {
             switch (comandos[0]){
                 case "mkdir":
                     if(comandos.length == 2) {
-                        atual.mkdir(comandos[1]);
+                        inode++;
+                        atual.mkdir(comandos[1],inode);
                     }else {
                         System.out.println("Argumentos Inválidos (- mkdir <nome>)");
                     }
@@ -62,7 +63,8 @@ public class Terminal {
 
                 case "touch":
                     if(comandos.length == 2) {
-                        atual.touch(comandos[1]);
+                        inode++;
+                        atual.touch(comandos[1],inode);
                     }else {
                         System.out.println("Argumentos Inválidos (touch <nome>)");
                     }
@@ -70,7 +72,8 @@ public class Terminal {
 
                 case "echo":
                     if(comandos.length == 4) {
-                        atual.echo(comandos[1], comandos[2], comandos[3]);
+                        inode++;
+                        atual.echo(comandos[1], comandos[2], comandos[3],inode);
                     }else {
                         System.out.println("Argumentos Inválidos (echo <texto> >|>> <arquivo>)");
                     }
