@@ -29,45 +29,93 @@ public class Terminal {
 
             switch (comandos[0]){
                 case "mkdir":
-                    atual.mkdir(comandos[1]);
-                    break;
-
-                case "tree":
-                    atual.tree();
-                    break;
-
-                case "exit":
-                    System.out.println("Encerrando terminal");
-                    return;
-
-                    case "touch":
-                    atual.touch(comandos[1]);
+                    if(comandos.length == 2) {
+                        atual.mkdir(comandos[1]);
+                    }else {
+                        System.out.println("Argumentos Inválidos (- mkdir <nome>)");
+                    }
                     break;
 
                 case "rmdir":
-                    atual.rmdir(comandos[1]);
+                    if(comandos.length == 2) {
+                        atual.rmdir(comandos[1]);
+                    }else {
+                        System.out.println("Argumentos Inválidos (rmdir <nome>)");
+                    }
                     break;
+
+                case "tree":
+                    if(comandos.length == 1) {
+                        atual.tree();
+                    }else {
+                        System.out.println("Argumentos Inválidos (tree)");
+                    }
+                    break;
+
                 case "rename":
-                    atual.rename(comandos[1],comandos[2]);
+                    if(comandos.length == 3) {
+                        atual.rename(comandos[1], comandos[2]);
+                    }else {
+                        System.out.println("Argumentos Inválidos (rename <nome_antigo> <novo_nome>)");
+                    }
                     break;
+
+                case "touch":
+                    if(comandos.length == 2) {
+                        atual.touch(comandos[1]);
+                    }else {
+                        System.out.println("Argumentos Inválidos (touch <nome>)");
+                    }
+                    break;
+
                 case "echo":
-                    atual.echo(comandos[1],comandos[2],comandos[3]);
+                    if(comandos.length == 4) {
+                        atual.echo(comandos[1], comandos[2], comandos[3]);
+                    }else {
+                        System.out.println("Argumentos Inválidos (echo <texto> >|>> <arquivo>)");
+                    }
                     break;
+
                 case "cat":
-                    atual.cat(comandos[1]);
+                    if(comandos.length == 2) {
+                        atual.cat(comandos[1]);
+                    }else {
+                        System.out.println("Argumentos Inválidos (cat <arquivo>)");
+                    }
                     break;
+
                 case "rm":
-                    atual.rm(comandos[1]);
+                    if(comandos.length == 2) {
+                        atual.rm(comandos[1]);
+                    }else {
+                        System.out.println("Argumentos Inválidos (rm <nome>)");
+                    }
                     break;
+
                 case "head":
-                    atual.head(comandos[1],comandos[2]);
+                    if(comandos.length == 3) {
+                        atual.head(comandos[1], comandos[2]);
+                    }else {
+                        System.out.println("Argumentos Inválidos (head <arquivo> <n>)");
+                    }
                     break;
+
                 case "tail":
-                    atual.tail(comandos[1],comandos[2]);
+                    if(comandos.length == 3) {
+                        atual.tail(comandos[1], comandos[2]);
+                    }else {
+                        System.out.println("Argumentos Inválidos (tail <arquivo> <n>)");
+                    }
                     break;
+
                 case "wc":
-                    atual.wc(comandos[1]);
+                    if(comandos.length == 2){
+                        atual.wc(comandos[1]);
+                    }else {
+                        System.out.println("Argumentos Inválidos (wc <arquivo>)");
+                    }
                     break;
+
                 case "cd":
                     if(comandos.length==2){
                         if(comandos[1].equals("..")){
@@ -99,6 +147,8 @@ public class Terminal {
                                 }
                             }
                         }
+                    } else {
+                        System.out.println("Argumentos Inválidos (cd <nome>|..)");
                     }
                     break;
 
@@ -111,6 +161,8 @@ public class Terminal {
                             System.out.println("Diretório inicial inválido.");
                         }
 
+                    }else {
+                        System.out.println("Argumentos Inválidos (find <diretorio> -name <nome>)");
                     }
                     break;
 
@@ -134,6 +186,8 @@ public class Terminal {
                             System.out.println("Arquivo não encontrado.");
                         }
 
+                    }else {
+                        System.out.println("Argumentos Inválidos (grep <termo> <arquivo>)");
                     }
                     break;
 
@@ -164,6 +218,8 @@ public class Terminal {
                             System.out.println("Arquivo ou diretório não encontrado.");
                         }
 
+                    }else {
+                        System.out.println("Argumentos Inválidos (chmod <permissao> <nome>)");
                     }
                     break;
 
@@ -194,6 +250,8 @@ public class Terminal {
                             System.out.println("Arquivo ou diretório não encontrado.");
                         }
 
+                    }else {
+                        System.out.println("Argumentos Inválidos (chown <proprietario> <nome>)");
                     }
                     break;
 
@@ -209,7 +267,17 @@ public class Terminal {
                             }
                         }
 
+                    }else {
+                        System.out.println("Argumentos Inválidos (ls -l)");
                     }
+                    break;
+
+                case "exit":
+                    if(comandos.length == 1){
+                        System.out.println("Encerrando terminal");
+                        return;
+                    }else {
+                        System.out.println("Argumentos Inválidos (exit)");}
                     break;
 
 

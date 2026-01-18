@@ -18,5 +18,5 @@ public interface Comandos {
     void setNome(String nome);
     ArrayList<Comandos> getFilhos();
     void find (String  nomeProcurado);
-
+    void grep(String termo);
 }

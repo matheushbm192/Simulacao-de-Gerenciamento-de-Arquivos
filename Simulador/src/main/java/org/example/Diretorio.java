@@ -211,7 +211,7 @@ public class Diretorio  implements Comandos {
         Comandos diretorioArquivo = buscarDiretorioArquivo(nomeArquivo);
 
         if (diretorioArquivo instanceof Arquivo arquivo){
-            arquivo.cat();
+            arquivo.cat(nomeArquivo);
         }
     }
 
@@ -260,21 +260,18 @@ public class Diretorio  implements Comandos {
         buscarRecursivo(this, nomeProcurado, this.getNome());
     }
 
-    private void buscarRecursivo(
-            Comandos atual,
-            String nomeProcurado,
-            String caminhoAtual
-    ) {
+    @Override
+    public void grep(String termo) {
+
+    }
+
+    private void buscarRecursivo(Comandos atual, String nomeProcurado, String caminhoAtual) {
         if (atual.getNome().equals(nomeProcurado)) {
             System.out.println(caminhoAtual);
         }
 
         for (Comandos c : atual.getFilhos()) {
-            buscarRecursivo(
-                    c,
-                    nomeProcurado,
-                    caminhoAtual + "\\" + c.getNome()
-            );
+            buscarRecursivo(c, nomeProcurado, caminhoAtual + "\\" + c.getNome());
         }
     }
 
