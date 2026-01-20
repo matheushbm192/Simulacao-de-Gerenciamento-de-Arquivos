@@ -3,12 +3,12 @@ package org.example;
 import java.util.ArrayList;
 
 public interface Comandos {
-    void mkdir(String nomeDiretorio,int inode);
+    void mkdir(String nomeDiretorio);
     void tree();
-    void touch(String nomeArquivo,int inode);
+    void touch(String nomeArquivo);
     void rmdir(String nomeDiretorio);
     void rename (String nomeDiretorioArquivo, String novoNomeDiretorioArquivo);
-    void echo(String texto,String atributo, String nomeArquivo,int inode);
+    void echo(String texto,String atributo, String nomeArquivo);
     void cat(String nomeArquivo);
     void rm(String nomeDiretorioArquivo);
     void head(String nomeArquivo, String numeroDeLinhas);
@@ -24,5 +24,8 @@ public interface Comandos {
     void du(String nomeDiretorio);
     void zip(String nomeZip, ArrayList<String> itens);
     void unzip(String nomeZip);
-
+    void cp(String nomeOrigem,Diretorio destino);
+    void mv(String nomeOrigem,String nomeDestino);
+    void diff(String nomeArquivo1,String nomeArquivo2);
+    Comandos clonarDiretorioArquivo();
 }

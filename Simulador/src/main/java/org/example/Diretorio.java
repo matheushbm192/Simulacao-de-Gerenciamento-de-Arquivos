@@ -3,7 +3,7 @@ package org.example;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class Diretorio  implements Comandos {
+public class Diretorio  implements Comandos,Cloneable {
     private String nome;
     private String tipo;
     private double tamanhoBytes;
@@ -24,9 +24,9 @@ public class Diretorio  implements Comandos {
     private static long contadorInode = 1;
     private ArrayList<Comandos> diretoriosArquivos = new ArrayList<>();
 
-    public Diretorio(String nomeDiretorio,int inode){
+    public Diretorio(String nomeDiretorio){
         this.nome = nomeDiretorio;
-        this.inode = inode;
+        this.inode = SistemaOperacional.getInstance().gerarInode();
     }
 
     public String getNome() {
@@ -115,6 +115,9 @@ public class Diretorio  implements Comandos {
         return diretoriosArquivos;
     }
 
+    public void addFilho(Comandos diretorioArquivo){
+        this.diretoriosArquivos.add(diretorioArquivo);
+    }
     public void setDiretoriosArquivos(ArrayList<Comandos> diretoriosArquivos) {
         this.diretoriosArquivos = diretoriosArquivos;
     }
@@ -130,8 +133,8 @@ public class Diretorio  implements Comandos {
 
 
     @Override
-    public void mkdir(String nomeDiretorio,int inode){
-        diretoriosArquivos.add(new Diretorio(nomeDiretorio,inode));
+    public void mkdir(String nomeDiretorio){
+        diretoriosArquivos.add(new Diretorio(nomeDiretorio));
     }
 
     @Override
@@ -142,8 +145,8 @@ public class Diretorio  implements Comandos {
     }
 
     @Override
-    public void touch(String nomeArquivo, int inode) {
-        diretoriosArquivos.add(new Arquivo(nomeArquivo,inode));
+    public void touch(String nomeArquivo) {
+        diretoriosArquivos.add(new Arquivo(nomeArquivo));
     }
 
     private void imprimirTree(Diretorio dir, int nivel) {
@@ -191,7 +194,7 @@ public class Diretorio  implements Comandos {
 
     //todo:rever implemntação
     @Override
-    public void echo(String texto, String atributo, String nomeArquivo,int inode) {
+    public void echo(String texto, String atributo, String nomeArquivo) {
         Comandos diretorioArquivo = buscarDiretorioArquivo(nomeArquivo);
 
         if(diretorioArquivo instanceof Arquivo arquivo){
@@ -204,7 +207,7 @@ public class Diretorio  implements Comandos {
             }
         }else{
             //se não existir, cria
-            Arquivo novo = new Arquivo(nomeArquivo,inode);
+            Arquivo novo = new Arquivo(nomeArquivo);
             novo.escrever(texto);
             diretoriosArquivos.add(novo);
         }
@@ -303,6 +306,77 @@ public class Diretorio  implements Comandos {
         }else{
             System.out.println("Diretorio não foi encontrado");
         }
+
+    }
+//todo: adicionar ao destino
+    @Override
+    public void cp(String nomeOrigem, Diretorio destino) {
+        Comandos diretorioArquivoClonado = null;
+
+        if (this.nome.equals(nomeOrigem)) {
+             diretorioArquivoClonado = clonarDiretorioArquivo();
+
+        }else{
+            Comandos diretorioArquivo = buscarDiretorioArquivo(nomeOrigem);
+
+            if(diretorioArquivo instanceof Diretorio diretorioOrigem) {
+                diretorioArquivoClonado = diretorioOrigem.clonarDiretorioArquivo();
+
+            }else if(diretorioArquivo instanceof Arquivo arquivoOrigem){
+                diretorioArquivoClonado = arquivoOrigem.clonarDiretorioArquivo();
+            }
+        }
+        if(diretorioArquivoClonado != null){
+            destino.addFilho(diretorioArquivoClonado);
+        }
+
+    }
+
+    public Comandos clonarDiretorioArquivo(){
+        Diretorio clone = new Diretorio(this.nome);
+
+        // Identidade
+        clone.tipo = "diretorio";
+
+        // Permissões
+        clone.leitura = this.leitura;
+        clone.escrita = this.escrita;
+        clone.execucao = this.execucao;
+        clone.permissoesOctal = this.permissoesOctal;
+        clone.permissoesSimbolicas = this.permissoesSimbolicas;
+
+        // Dono
+        clone.proprietario = this.proprietario;
+        clone.grupo = this.grupo;
+
+        // Datas
+        clone.dataCriacao = new Date();
+        clone.dataUltimoAcesso = new Date();
+        clone.dataAlteracaoMetadados = new Date();
+        clone.dataUltimaModificacao = this.dataUltimaModificacao;
+
+        // Inode novo
+        clone.inode = SistemaOperacional.getInstance().gerarInode();
+
+        // Clonagem profunda dos filhos (Composite)
+        for (Comandos diretorioArquivo : this.diretoriosArquivos) {
+            Comandos filhoClone = diretorioArquivo.clonarDiretorioArquivo();
+            clone.diretoriosArquivos.add(filhoClone);
+        }
+
+        // Tamanho recalculado
+        clone.tamanhoBytes = clone.getTamanhoBytes();
+
+        return clone;
+    }
+
+    @Override
+    public void mv(String nomeOrigem, String nomeDestino) {
+
+    }
+
+    @Override
+    public void diff(String nomeArquivo1, String nomeArquivo2) {
 
     }
 
@@ -431,7 +505,7 @@ public class Diretorio  implements Comandos {
             return;
         }
 
-        Arquivo zip = new Arquivo(nomeZip, gerarInode());
+        Arquivo zip = new Arquivo(nomeZip);
 
         for (String nomeItem : itens) {
 

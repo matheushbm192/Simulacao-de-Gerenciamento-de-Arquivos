@@ -29,9 +29,9 @@ public class Arquivo implements Comandos {
 
 
     //todo: arrumar o construtor pois em sua criação ele precisa ter mais informações
-    public Arquivo(String nome, long inode) {
+    public Arquivo(String nome) {
         this.nome = nome;
-        this.inode = inode;
+        this.inode = SistemaOperacional.getInstance().gerarInode();
         this.texto = "";
 
         this.zip = nome.endsWith(".zip");
@@ -196,7 +196,7 @@ public class Arquivo implements Comandos {
 
 
     @Override
-    public void mkdir(String nomeDiretorio,int inode) {
+    public void mkdir(String nomeDiretorio) {
         System.out.println("Erro: arquivo não pode conter diretórios.");
     }
 
@@ -213,7 +213,7 @@ public class Arquivo implements Comandos {
     }
 
     @Override
-    public void echo(String texto, String atributo, String nomeArquivo,int inode) {
+    public void echo(String texto, String atributo, String nomeArquivo) {
         System.out.println("Erro: echo deve ser executado em um diretório.");
     }
 
@@ -234,7 +234,7 @@ public class Arquivo implements Comandos {
     }
 
     @Override
-    public void touch(String nomeArquivo, int inode) {
+    public void touch(String nomeArquivo) {
         System.out.println("Erro: não é possível criar arquivo dentro de um arquivo.");
     }
 
@@ -403,6 +403,68 @@ public class Arquivo implements Comandos {
     @Override
     public void du(String nomeDiretorio) {
         System.out.println("Erro: du deve ser executado em um diretório.");
+    }
+
+    @Override
+    public void cp(String nomeOrigem, Diretorio destino) {
+
+        if(this.nome.equals(nomeOrigem)){
+          destino.addFilho(this.clonarDiretorioArquivo());
+        }else{
+            System.out.println("Argumento invalido");
+        }
+
+    }
+
+    @Override
+    public Comandos clonarDiretorioArquivo() {
+        //todo: fazer verificação se destino existe, se não existir fazer algo quanto ao nome da copia
+        Arquivo clone = new Arquivo( this.nome);
+        // Identidade
+        clone.tipo = this.tipo;
+
+        // Conteúdo (cópia real)
+        clone.texto = this.texto != null ? new String(this.texto) : null;
+
+        // Contadores
+        clone.contLinhas = this.contLinhas;
+        clone.contPalavras = this.contPalavras;
+        clone.countLetras = this.countLetras;
+
+        // Permissões
+        clone.leitura = this.leitura;
+        clone.escrita = this.escrita;
+        clone.execucao = this.execucao;
+        clone.permissoesOctal = this.permissoesOctal;
+        clone.permissoesSimbolicas = this.permissoesSimbolicas;
+
+        // Dono
+        clone.proprietario = this.proprietario;
+        clone.grupo = this.grupo;
+
+        // Datas
+        clone.dataCriacao = new Date(); // Birth
+        clone.dataUltimoAcesso = new Date();
+        clone.dataAlteracaoMetadados = new Date();
+        clone.dataUltimaModificacao = this.dataUltimaModificacao;
+
+        // Inode novo
+        clone.inode = SistemaOperacional.getInstance().gerarInode();
+
+        // Tamanho recalculado
+        clone.tamanhoBytes = (clone.texto == null) ? 0 : clone.texto.length();
+
+        return clone;
+    }
+
+    @Override
+    public void mv(String nomeOrigem, String nomeDestino) {
+
+    }
+
+    @Override
+    public void diff(String nomeArquivo1, String nomeArquivo2) {
+
     }
 
     @Override
