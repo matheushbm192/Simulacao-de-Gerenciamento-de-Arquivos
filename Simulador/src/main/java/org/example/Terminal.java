@@ -310,7 +310,13 @@ public class Terminal {
                     break;
                 case"mv":
                     if (comandos.length == 3){
-                        atual.mv(comandos[1],comandos[2]);
+                        Comandos diretorioArquivo = pesquisarNaArvore( root,comandos[2]);
+                        if(diretorioArquivo instanceof Diretorio destino) {
+                            atual.mv(comandos[1], destino);
+                        }else {
+                            System.out.println("Argumentos Inválidos, o destino deve ser um diretorio");
+                        }
+
                     }else{
                         System.out.println("Argumentos Inválidos (mv <origem> <destino>)");
                     }

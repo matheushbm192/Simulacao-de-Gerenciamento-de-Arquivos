@@ -458,8 +458,8 @@ public class Arquivo implements Comandos {
     }
 
     @Override
-    public void mv(String nomeOrigem, String nomeDestino) {
-
+    public void mv(String nomeOrigem, Diretorio destino) {
+        System.out.println("Erro: du deve ser executado em um diretório.");
     }
 
     @Override

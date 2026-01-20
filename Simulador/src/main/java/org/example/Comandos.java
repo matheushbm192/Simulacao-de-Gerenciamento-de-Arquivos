@@ -25,7 +25,7 @@ public interface Comandos {
     void zip(String nomeZip, ArrayList<String> itens);
     void unzip(String nomeZip);
     void cp(String nomeOrigem,Diretorio destino);
-    void mv(String nomeOrigem,String nomeDestino);
+    void mv(String nomeOrigem,Diretorio destino);
     void diff(String nomeArquivo1,String nomeArquivo2);
     Comandos clonarDiretorioArquivo();
 }

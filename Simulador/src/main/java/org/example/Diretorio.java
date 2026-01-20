@@ -371,8 +371,15 @@ public class Diretorio  implements Comandos,Cloneable {
     }
 
     @Override
-    public void mv(String nomeOrigem, String nomeDestino) {
+    public void mv(String nomeOrigem, Diretorio destino) {
 
+        Comandos diretorioArquivoMover = buscarDiretorioArquivo(nomeOrigem);
+
+        if(diretorioArquivoMover != null){
+            destino.addFilho(diretorioArquivoMover);
+            this.diretoriosArquivos.remove(diretorioArquivoMover);
+
+        }
     }
 
     @Override
