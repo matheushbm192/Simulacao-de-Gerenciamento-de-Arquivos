@@ -20,7 +20,11 @@ public class Terminal {
 
         while (true){
 
+            System.out.print(montarPrompt(caminho));
+
             String comando = entrada.nextLine();
+
+            historico.add(comando);
 
             //mantém historico de comandos digitados
             historico.add(comando);
@@ -32,32 +36,24 @@ public class Terminal {
                     if(comandos.length == 2) {
                         inode++;
                         atual.mkdir(comandos[1],inode);
-                    }else {
-                        System.out.println("Argumentos Inválidos (- mkdir <nome>)");
                     }
                     break;
 
                 case "rmdir":
                     if(comandos.length == 2) {
                         atual.rmdir(comandos[1]);
-                    }else {
-                        System.out.println("Argumentos Inválidos (rmdir <nome>)");
                     }
                     break;
 
                 case "tree":
                     if(comandos.length == 1) {
                         atual.tree();
-                    }else {
-                        System.out.println("Argumentos Inválidos (tree)");
                     }
                     break;
 
                 case "rename":
                     if(comandos.length == 3) {
                         atual.rename(comandos[1], comandos[2]);
-                    }else {
-                        System.out.println("Argumentos Inválidos (rename <nome_antigo> <novo_nome>)");
                     }
                     break;
 
@@ -65,8 +61,6 @@ public class Terminal {
                     if(comandos.length == 2) {
                         inode++;
                         atual.touch(comandos[1],inode);
-                    }else {
-                        System.out.println("Argumentos Inválidos (touch <nome>)");
                     }
                     break;
 
@@ -74,84 +68,77 @@ public class Terminal {
                     if(comandos.length == 4) {
                         inode++;
                         atual.echo(comandos[1], comandos[2], comandos[3],inode);
-                    }else {
-                        System.out.println("Argumentos Inválidos (echo <texto> >|>> <arquivo>)");
                     }
                     break;
 
                 case "cat":
                     if(comandos.length == 2) {
                         atual.cat(comandos[1]);
-                    }else {
-                        System.out.println("Argumentos Inválidos (cat <arquivo>)");
                     }
                     break;
 
                 case "rm":
                     if(comandos.length == 2) {
                         atual.rm(comandos[1]);
-                    }else {
-                        System.out.println("Argumentos Inválidos (rm <nome>)");
                     }
                     break;
 
                 case "head":
                     if(comandos.length == 3) {
                         atual.head(comandos[1], comandos[2]);
-                    }else {
-                        System.out.println("Argumentos Inválidos (head <arquivo> <n>)");
                     }
                     break;
 
                 case "tail":
                     if(comandos.length == 3) {
                         atual.tail(comandos[1], comandos[2]);
-                    }else {
-                        System.out.println("Argumentos Inválidos (tail <arquivo> <n>)");
                     }
                     break;
 
                 case "wc":
                     if(comandos.length == 2){
                         atual.wc(comandos[1]);
-                    }else {
-                        System.out.println("Argumentos Inválidos (wc <arquivo>)");
                     }
                     break;
 
                 case "cd":
-                    if(comandos.length==2){
-                        if(comandos[1].equals("..")){
+                    if (comandos.length == 2) {
 
-                            //cd..
-                            if(caminho.size() > 1){
-                                caminho.remove(caminho.size()-1);
-                                atual = caminho.get(caminho.size()-1);
+                        // cd ..
+                        if (comandos[1].equals("..")) {
 
-                            }else if ("/".equals(comandos[1])){
-                                //cd /
-                                caminho.clear();
-                                caminho.add(root);
-                                atual = root;
+                            if (caminho.size() > 1) {
+                                caminho.remove(caminho.size() - 1);
+                                atual = caminho.get(caminho.size() - 1);
+                            }
 
-                            }else{
-                                //cd <nome>
-                                boolean encontrado = false;
-                                for(Comandos c : atual.getFilhos()){
-                                    if(c instanceof Diretorio && c.getNome().equals(comandos[1])){
-                                        atual = c;
-                                        caminho.add(atual);
-                                        encontrado = true;
-                                        break;
-                                    }
-                                }
-                                if(!encontrado){
-                                    System.out.println("Diretório não encontrado. ");
+                        }
+                        // cd /
+                        else if (comandos[1].equals("/")) {
+
+                            caminho.clear();
+                            caminho.add(root);
+                            atual = root;
+
+                        }
+                        // cd <nome>
+                        else {
+
+                            boolean encontrado = false;
+
+                            for (Comandos c : atual.getFilhos()) {
+                                if (c instanceof Diretorio && c.getNome().equals(comandos[1])) {
+                                    atual = c;
+                                    caminho.add(atual);
+                                    encontrado = true;
+                                    break;
                                 }
                             }
+
+                            if (!encontrado) {
+                                System.out.println("Diretório não encontrado.");
+                            }
                         }
-                    } else {
-                        System.out.println("Argumentos Inválidos (cd <nome>|..)");
                     }
                     break;
 
@@ -164,8 +151,6 @@ public class Terminal {
                             System.out.println("Diretório inicial inválido.");
                         }
 
-                    }else {
-                        System.out.println("Argumentos Inválidos (find <diretorio> -name <nome>)");
                     }
                     break;
 
@@ -189,8 +174,6 @@ public class Terminal {
                             System.out.println("Arquivo não encontrado.");
                         }
 
-                    }else {
-                        System.out.println("Argumentos Inválidos (grep <termo> <arquivo>)");
                     }
                     break;
 
@@ -221,8 +204,6 @@ public class Terminal {
                             System.out.println("Arquivo ou diretório não encontrado.");
                         }
 
-                    }else {
-                        System.out.println("Argumentos Inválidos (chmod <permissao> <nome>)");
                     }
                     break;
 
@@ -253,8 +234,6 @@ public class Terminal {
                             System.out.println("Arquivo ou diretório não encontrado.");
                         }
 
-                    }else {
-                        System.out.println("Argumentos Inválidos (chown <proprietario> <nome>)");
                     }
                     break;
 
@@ -270,8 +249,6 @@ public class Terminal {
                             }
                         }
 
-                    }else {
-                        System.out.println("Argumentos Inválidos (ls -l)");
                     }
                     break;
 
@@ -279,15 +256,50 @@ public class Terminal {
                     if(comandos.length == 1){
                         System.out.println("Encerrando terminal");
                         return;
-                    }else {
-                        System.out.println("Argumentos Inválidos (exit)");}
+                    }
                     break;
 
+                case "zip":
+                    if (comandos.length >= 3) {
 
-                default:
+                        String nomeZip = comandos[1];
+                        ArrayList<String> itens = new ArrayList<>();
+
+                        for (int i = 2; i < comandos.length; i++) {
+                            itens.add(comandos[i]);
+                        }
+
+                        atual.zip(nomeZip, itens);
+                    }
+                    break;
+
+                case "unzip":
+                    if (comandos.length == 2) {
+                        atual.unzip(comandos[1]);
+                    }
+                    break;
+
+                    default:
                     System.out.println("Comando inválido");
                     break;
             }
         }
     }
+
+    private static String montarPrompt(ArrayList<Comandos> caminho) {
+        StringBuilder sb = new StringBuilder("PS ");
+
+        for (int i = 0; i < caminho.size(); i++) {
+            sb.append(caminho.get(i).getNome());
+
+            if (i < caminho.size() - 1) {
+                sb.append("\\");
+            }
+        }
+
+        sb.append("> ");
+        return sb.toString();
+    }
+
+
 }

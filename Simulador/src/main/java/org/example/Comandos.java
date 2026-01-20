@@ -22,5 +22,7 @@ public interface Comandos {
     void stat(String nomeDiretorioArquivo);
     double getTamanhoBytes();
     void du(String nomeDiretorio);
+    void zip(String nomeZip, ArrayList<String> itens);
+    void unzip(String nomeZip);
 
 }

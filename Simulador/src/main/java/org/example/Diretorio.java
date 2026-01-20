@@ -21,6 +21,7 @@ public class Diretorio  implements Comandos {
     private Date dataUltimoAcesso;
     private Date dataAlteracaoMetadados;
     private final int bloco = 512;
+    private static long contadorInode = 1;
     private ArrayList<Comandos> diretoriosArquivos = new ArrayList<>();
 
     public Diretorio(String nomeDiretorio,int inode){
@@ -265,7 +266,7 @@ public class Diretorio  implements Comandos {
 
     @Override
     public void grep(String termo) {
-
+        System.out.println("grep: operação inválida para diretório");
     }
 
     @Override
@@ -414,10 +415,69 @@ public class Diretorio  implements Comandos {
         );
 
         System.out.println(
-                " Criação: " + dataCriacao
+                "Criação: " + dataCriacao
         );
     }
 
+    private long gerarInode() {
+        return contadorInode++;
+    }
 
+    @Override
+    public void zip(String nomeZip, ArrayList<String> itens) {
+
+        if (!nomeZip.endsWith(".zip")) {
+            System.out.println("Erro: arquivo zip deve terminar com .zip");
+            return;
+        }
+
+        Arquivo zip = new Arquivo(nomeZip, gerarInode());
+
+        for (String nomeItem : itens) {
+
+            boolean encontrado = false;
+
+            for (Comandos c : diretoriosArquivos) {
+
+                if (c.getNome().equals(nomeItem)) {
+                    zip.adicionarAoZip(c);
+                    encontrado = true;
+                    break;
+                }
+            }
+
+            if (!encontrado) {
+                System.out.println("Aviso: item '" + nomeItem + "' não encontrado");
+            }
+        }
+
+        diretoriosArquivos.add(zip);
+
+        System.out.println("Arquivo " + nomeZip + " criado com sucesso.");
+    }
+
+    @Override
+    public void unzip(String nomeZip) {
+
+        Comandos item = buscarDiretorioArquivo(nomeZip);
+
+        if (!(item instanceof Arquivo)) {
+            System.out.println("unzip: arquivo não encontrado");
+            return;
+        }
+
+        Arquivo zipFile = (Arquivo) item;
+
+        if (!zipFile.isZip()) {
+            System.out.println("unzip: " + nomeZip + " não é um arquivo zip");
+            return;
+        }
+
+        for (Comandos c : zipFile.getConteudoZip()) {
+            diretoriosArquivos.add(c);
+        }
+
+        System.out.println("Arquivo " + nomeZip + " descompactado com sucesso.");
+    }
 
 }

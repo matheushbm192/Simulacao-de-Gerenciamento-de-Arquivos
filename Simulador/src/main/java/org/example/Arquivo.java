@@ -6,7 +6,6 @@ import java.util.Date;
 public class Arquivo implements Comandos {
     private String nome;
     private String tipo;
-
     private Date dataCriacao;
     private Date dataUltimaModificacao;
     private String texto;
@@ -23,14 +22,37 @@ public class Arquivo implements Comandos {
     private String permissoesSimbolicas; // ex: -rw-r--r--
     private Date dataUltimoAcesso;
     private Date dataAlteracaoMetadados;
-    private int tamanhoBytes = (texto == null) ? 0 : texto.length();
+    private int tamanhoBytes;
     private final int bloco = 512;
+    private boolean zip;
+    private ArrayList<Comandos> conteudoZip = new ArrayList<>();
+
+
     //todo: arrumar o construtor pois em sua criação ele precisa ter mais informações
-    public Arquivo(String nome,int inode) {
+    public Arquivo(String nome, long inode) {
         this.nome = nome;
         this.inode = inode;
         this.texto = "";
+
+        this.zip = nome.endsWith(".zip");
+        this.tipo = "-";
+
+        this.leitura = true;
+        this.escrita = true;
+        this.execucao = false;
+
+        this.proprietario = "user";
+        this.grupo = "user";
+
+        this.dataCriacao = new Date();
+        this.dataUltimaModificacao = new Date();
+        this.dataUltimoAcesso = new Date();
+        this.dataAlteracaoMetadados = new Date();
+
+        this.tamanhoBytes = 0;
     }
+
+
 
     public String getNome() {
         return nome;
@@ -167,6 +189,11 @@ public class Arquivo implements Comandos {
         this.texto = texto;
         this.dataUltimaModificacao = new Date();
     }
+
+    private void atualizarTamanho() {
+        this.tamanhoBytes = texto.length();
+    }
+
 
     @Override
     public void mkdir(String nomeDiretorio,int inode) {
@@ -378,6 +405,17 @@ public class Arquivo implements Comandos {
         System.out.println("Erro: du deve ser executado em um diretório.");
     }
 
+    @Override
+    public void zip(String nomeZip, ArrayList<String> itens) {
+        System.out.println("zip: operação inválida em arquivo");
+    }
+
+    @Override
+    public void unzip(String nomeZip) {
+
+        System.out.println("Erro: unzip só pode ser executado em diretórios.");
+    }
+
     public String detalhes() {
 
         String tipo = "-";
@@ -401,5 +439,15 @@ public class Arquivo implements Comandos {
         System.out.println(comando + ": operação inválida para arquivo");
     }
 
+    public void adicionarAoZip(Comandos c) {
+        conteudoZip.add(c);
+    }
 
+
+    public boolean isZip() {
+        return zip;
+    }
+    public ArrayList<Comandos> getConteudoZip() {
+        return conteudoZip;
+    }
 }
