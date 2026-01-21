@@ -298,7 +298,7 @@ public class Terminal {
                     break;
                 case "cp":
                     if(comandos.length == 3){
-                        Comandos diretorioArquivo = pesquisarNaArvore( root,comandos[2]);
+                        Comandos diretorioArquivo = pesquisarNaArvore(root,comandos[2]);
                         if(diretorioArquivo instanceof Diretorio destino) {
                             atual.cp(comandos[1], destino);
                         }else {
@@ -405,6 +405,7 @@ public class Terminal {
             Comandos encontrado = pesquisarNaArvore(diretorioArquivo, nomeDestino);
             if (encontrado != null) {
                 return encontrado;
+
             }
         }
 
