@@ -164,6 +164,10 @@ public class Diretorio  implements Comandos,Cloneable {
     public void mkdir(String nomeDiretorio){
         diretoriosArquivos.add(new Diretorio(nomeDiretorio,this));
     }
+    @Override
+    public void touch(String nomeArquivo) {
+        diretoriosArquivos.add(new Arquivo(nomeArquivo,this));
+    }
 
     @Override
     public void tree() {
@@ -172,30 +176,25 @@ public class Diretorio  implements Comandos,Cloneable {
 
     }
 
-    @Override
-    public void touch(String nomeArquivo) {
-        diretoriosArquivos.add(new Arquivo(nomeArquivo,this));
-    }
-
     private void imprimirTree(Diretorio dir, int nivel) {
 
-
+    // Indentação do nível atual
         for (int i = 0; i < nivel; i++) {
             System.out.print("   ");
         }
 
-        System.out.println("|-- " + dir.nome);
+        System.out.println("|-- " + dir.getNome());
 
+        // Percorre filhos
         for (Comandos c : dir.diretoriosArquivos) {
 
-            for (int i = 0; i <= nivel; i++) {
-                System.out.print("   ");
-            }
-
-            System.out.println("|-- " + c.getNome());
-
-            if (c instanceof Diretorio) {
-                imprimirTree((Diretorio) c, nivel + 1);
+            if (c instanceof Diretorio diretorio) {
+                imprimirTree(diretorio, nivel + 1);
+            } else {
+                for (int i = 0; i <= nivel; i++) {
+                    System.out.print("   ");
+                }
+                System.out.println("|-- " + c.getNome());
             }
         }
     }
