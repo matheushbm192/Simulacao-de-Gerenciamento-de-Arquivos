@@ -122,7 +122,26 @@ public class Diretorio  implements Comandos,Cloneable {
         this.diretoriosArquivos = diretoriosArquivos;
     }
 
-    private Comandos buscarDiretorioArquivo(String nomeDiretorioArquivo){
+    public  Comandos buscarPorPathParcial(String path, Comandos atual){
+        String[] nomesDiretoriosArquivos = path.split("\\\\");
+        if(nomesDiretoriosArquivos.length == 1 ){
+            if(atual instanceof Diretorio diretorioAtual){
+                return  diretorioAtual.buscarDiretorioArquivo(nomesDiretoriosArquivos[0]);
+            }
+        }else{ //local/janta/documento.txt
+            for (int i = 1; i < nomesDiretoriosArquivos.length; i++) {
+                if(atual instanceof Diretorio diretorioAtual){
+                    atual =  diretorioAtual.buscarDiretorioArquivo(nomesDiretoriosArquivos[i]);
+                }
+                if(atual != null && atual.getNome().equals(nomesDiretoriosArquivos[nomesDiretoriosArquivos.length-1])){
+                    return  atual;
+                }
+            }
+        }
+        return null;
+    }
+
+    public Comandos buscarDiretorioArquivo(String nomeDiretorioArquivo){
         for(Comandos diretorioArquivo : diretoriosArquivos ){
             if(nomeDiretorioArquivo.equals(diretorioArquivo.getNome())){
                 return diretorioArquivo;
@@ -173,12 +192,14 @@ public class Diretorio  implements Comandos,Cloneable {
     }
     @Override
     public void rmdir(String nomeDiretorio) {
-        Comandos diretorioArquivo = buscarDiretorioArquivo(nomeDiretorio);
+        Comandos diretorioArquivo = buscarPorPathParcial(nomeDiretorio,this);
 
         if(diretorioArquivo instanceof Diretorio diretorio){
+    // tenho que acessar o diretorio certo
 
             if(diretorio.diretoriosArquivos.isEmpty() ){
-                diretoriosArquivos.remove(diretorio);
+                int index = diretoriosArquivos.indexOf(diretorioArquivo);
+                diretoriosArquivos.remove(index);
 
             }
         }
@@ -394,7 +415,7 @@ public class Diretorio  implements Comandos,Cloneable {
     }
 
     @Override
-    public void diff(String nomeArquivo1, String nomeArquivo2) {
+    public void diff(Arquivo arquivo2) {
 
     }
 

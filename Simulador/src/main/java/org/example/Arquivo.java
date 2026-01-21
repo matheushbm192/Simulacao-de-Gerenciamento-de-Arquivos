@@ -459,7 +459,7 @@ public class Arquivo implements Comandos {
     }
 
     @Override
-    public void diff(String nomeArquivo1, String nomeArquivo2) {
+    public void diff(Arquivo arquivo2) {
 
     }
 

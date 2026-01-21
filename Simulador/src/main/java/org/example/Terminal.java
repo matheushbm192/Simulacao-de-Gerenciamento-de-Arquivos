@@ -24,10 +24,7 @@ public class Terminal {
 
             String comando = entrada.nextLine();
 
-            //mantém historico de comandos digitados
-            historico.add(comando);
-
-            String[] comandos = comando.split(" ");
+            String[] comandos = comando.split(" (?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
 
             switch (comandos[0]){
                 case "mkdir":
@@ -72,7 +69,7 @@ public class Terminal {
 
                 case "echo":
                     if(comandos.length == 4) {
-                        atual.echo(comandos[1], comandos[2], comandos[3]);
+                        atual.echo(comandos[1], comandos[2], comandos[3].replace("\"", ""));
                     }else {
                         System.out.println("Argumentos Inválidos (echo <texto> >|>> <arquivo>)");
                     }
@@ -320,11 +317,18 @@ public class Terminal {
                     }
                     break;
                 case"diff":
-                    if (comandos.length == 3){
-                        atual.diff(comandos[1],comandos[2]);
-                    }else{
-                        System.out.println("Argumentos Inválidos (diff <arquivo1> <arquivo2>)");
-                    }
+//                    if (comandos.length == 3){
+//                        Comandos arquivo1 = pesquisarNaArvore( root,comandos[1]);
+//                        Comandos arquivo2 = pesquisarNaArvore( root,comandos[2]);
+//                        if(arquivo1 instanceof  Arquivo && arquivo2 instanceof Arquivo){
+//                            arquivo1.diff(arquivo2);
+//                        }else {
+//                            System.out.println("Argumentos Inválidos ambos argumentos devem ser arquivos");
+//                        }
+//                        atual.diff(comandos[1]);
+//                    }else{
+//                        System.out.println("Argumentos Inválidos (diff <arquivo1> <arquivo2>)");
+//                    }
                     break;
                 case "exit":
                     if(comandos.length == 1){
@@ -377,12 +381,11 @@ public class Terminal {
 
 
 
-    public static  Comandos pesquisarNaArvore(Comandos atual, String nomeDestino) {
+    public static Comandos pesquisarNaArvore(Comandos atual, String nomeDestino) {
 
         if (atual.getNome().equals(nomeDestino)) {
             return atual;
         }
-
         for (Comandos diretorioArquivo : atual.getFilhos()) {
             Comandos encontrado = pesquisarNaArvore(diretorioArquivo, nomeDestino);
             if (encontrado != null) {
