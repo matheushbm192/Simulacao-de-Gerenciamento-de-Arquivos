@@ -1,7 +1,5 @@
 package org.example;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -30,19 +28,23 @@ public class Arquivo implements Comandos {
     private ArrayList<Comandos> conteudoZip = new ArrayList<>();
     private Diretorio diretorioPai;
 
-    //todo: arrumar o construtor pois em sua criação ele precisa ter mais informações
     public Arquivo(String nome,Diretorio diretorioPai) {
         this.nome = nome;
         this.inode = SistemaOperacional.getInstance().gerarInode();
         this.texto = "";
         this.diretorioPai = diretorioPai;
         this.zip = nome.endsWith(".zip");
+        if (zip) {
+            this.leitura = false;
+            this.escrita = false;
+            this.execucao = false;
+        } else {
+            this.leitura = true;
+            this.escrita = true;
+            this.execucao = true;
+        }
+
         this.tipo = "-";
-
-        this.leitura = true;
-        this.escrita = true;
-        this.execucao = false;
-
         this.proprietario = "user";
         this.grupo = "user";
 
@@ -340,8 +342,8 @@ public class Arquivo implements Comandos {
 
     public void grep(String termo) {
 
-        if (!leitura) {
-            System.out.println("Permissão negada: leitura.");
+        if (isZip()) {
+            System.out.println("grep: arquivo zip não suportado");
             return;
         }
 
@@ -365,7 +367,7 @@ public class Arquivo implements Comandos {
     }
 
     @Override
-    public double getTamanhoBytes() {
+    public int getTamanhoBytes() {
         return tamanhoBytes;
     }
 
@@ -384,7 +386,7 @@ public class Arquivo implements Comandos {
 
         System.out.println(
                 "Tamanho: " + tamanhoBytes +
-                        "  Blocos: " + (int) Math.ceil(tamanhoBytes / bloco) +
+                        "  Blocos: " + (int)(tamanhoBytes / bloco) +
                         "  Bloco IO: 4096 " +
                         tipo
         );
@@ -437,7 +439,16 @@ public class Arquivo implements Comandos {
     @Override
     public Comandos clonarDiretorioArquivo(Diretorio destino) {
         //todo: fazer verificação se destino existe, se não existir fazer algo quanto ao nome da copia
-        Arquivo clone = new Arquivo( this.nome,destino);
+
+        // Ajusta nome se for zip
+        String novoNome = this.nome;
+
+        if (this.isZip() && novoNome.endsWith(".zip")) {
+            novoNome = novoNome.replaceFirst("\\.zip$", "");
+        }
+
+        Arquivo clone = new Arquivo(novoNome, destino);
+
         // Identidade
         clone.tipo = this.tipo;
 
@@ -480,25 +491,27 @@ public class Arquivo implements Comandos {
         System.out.println("Erro: du deve ser executado em um diretório.");
     }
 
-    @Override
+    /*@Override
     public void diff(Arquivo arquivo2) {
 
-    }
+    }*/
+
 
     @Override
     public void zip(String nomeZip, ArrayList<String> itens) {
-        System.out.println("zip: operação inválida em arquivo");
+        comandoInvalido("zip");
+
     }
 
     @Override
     public void unzip(String nomeZip) {
+        comandoInvalido("unzip");
+        }
 
-        System.out.println("Erro: unzip só pode ser executado em diretórios.");
-    }
 
     public String detalhes() {
 
-        String tipo = "-"; // ou "d" se for diretório
+        String tipo = "-";
 
         String permissoes =
                 (leitura ? "r" : "-") +
@@ -509,8 +522,8 @@ public class Arquivo implements Comandos {
         int links = 1;
         String grupo = "group";
 
-        String data = LocalDateTime.now()
-                .format(DateTimeFormatter.ofPattern("MMM dd HH:mm"));
+        String data = new java.text.SimpleDateFormat("yyyy-MM-dd")
+                .format(dataUltimaModificacao);
 
         return String.format(
                 "%s%s  %d  %s  %s  %5d  %s  %s",

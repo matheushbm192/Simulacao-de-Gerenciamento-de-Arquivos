@@ -6,7 +6,7 @@ import java.util.Date;
 public class Diretorio  implements Comandos,Cloneable {
     private String nome;
     private String tipo;
-    private double tamanhoBytes;
+    private int tamanhoBytes;
     private Date dataCriacao;
     private Date dataUltimaModificacao;
     private boolean leitura;
@@ -24,10 +24,34 @@ public class Diretorio  implements Comandos,Cloneable {
     private static long contadorInode = 1;
     private ArrayList<Comandos> diretoriosArquivos = new ArrayList<>();
     private Diretorio diretorioPai;
+    private boolean zip;
+
+
     public Diretorio(String nomeDiretorio, Diretorio diretorioPai){
         this.nome = nomeDiretorio;
         this.diretorioPai = diretorioPai;
         this.inode = SistemaOperacional.getInstance().gerarInode();
+        this.zip = nome.endsWith(".zip");
+        this.zip = nome.endsWith(".zip");
+
+        if (zip) {
+            this.leitura = false;
+            this.escrita = false;
+            this.execucao = false;
+        } else {
+            this.leitura = true;
+            this.escrita = true;
+            this.execucao = true;
+        }
+
+        this.proprietario = "user";
+        this.grupo = "user";
+        this.tipo = "d";
+        this.dataCriacao = new Date();
+        this.dataUltimaModificacao = new Date();
+        this.dataUltimoAcesso = new Date();
+        this.dataAlteracaoMetadados = new Date();
+        this.tamanhoBytes = 0;
     }
 
     public String getNome() {
@@ -51,8 +75,8 @@ public class Diretorio  implements Comandos,Cloneable {
         this.tipo = tipo;
     }
 
-    public double getTamanhoBytes() {
-        double total = 0;
+    public int getTamanhoBytes() {
+        int total = 0;
 
         for (Comandos diretorioArquivo : diretoriosArquivos) {
             total += diretorioArquivo.getTamanhoBytes();
@@ -129,6 +153,10 @@ public class Diretorio  implements Comandos,Cloneable {
 
     public void setDiretorioPai(Diretorio diretorioPai) {
         this.diretorioPai = diretorioPai;
+    }
+
+    public boolean isZip() {
+        return zip;
     }
 
     public  Comandos buscarPorPathParcial(String path, Comandos atual){
@@ -222,12 +250,19 @@ public class Diretorio  implements Comandos,Cloneable {
     @Override
     public void echo(String texto, String atributo, String nomeArquivo) {
 
+
+
         if (!atributo.equals(">") && !atributo.equals(">>")) {
             System.out.println("echo: operador inválido (use > ou >>)");
             return;
         }
 
         Comandos diretorioArquivo = buscarDiretorioArquivo(nomeArquivo);
+
+        if (isZip()) {
+            System.out.println("echo: não é possível escrever em arquivo zip");
+            return;
+        }
 
         // Arquivo já existe
         if (diretorioArquivo instanceof Arquivo arquivo) {
@@ -254,7 +289,13 @@ public class Diretorio  implements Comandos,Cloneable {
 
     @Override
     public void cat(String nomeArquivo) {
+
         Comandos diretorioArquivo = buscarDiretorioArquivo(nomeArquivo);
+
+        if (isZip()) {
+            System.out.println("cat: não é possível ler arquivo zip");
+            return;
+        }
 
         if (diretorioArquivo instanceof Arquivo arquivo){
             arquivo.cat(nomeArquivo);
@@ -344,7 +385,7 @@ public class Diretorio  implements Comandos,Cloneable {
         }
 
     }
-//todo: adicionar ao destino
+
     @Override
     public void cp(String nomeOrigem, Diretorio destino) {
         Comandos diretorioArquivoClonado = null;
@@ -418,10 +459,10 @@ public class Diretorio  implements Comandos,Cloneable {
         }
     }
 
-    @Override
+    /*@Override
     public void diff(Arquivo arquivo2) {
 
-    }
+    }*/
 
     private void buscarRecursivo(Comandos atual, String nomeProcurado, String caminhoAtual) {
         if (atual.getNome().equals(nomeProcurado)) {
@@ -470,24 +511,28 @@ public class Diretorio  implements Comandos,Cloneable {
 
     public String detalhes() {
 
-        String tipo = "-";
+        String tipo = "d";
 
         String permissoes =
                 (leitura ? "r" : "-") +
                         (escrita ? "w" : "-") +
-                        (execucao ? "x" : "-");
+                        (execucao ? "x" : "-") +
+                        "r--r--"; // grupo + outros (exemplo fixo)
+
+        int links = 1;
+        String grupo = "group";
 
         String data = new java.text.SimpleDateFormat("yyyy-MM-dd")
                 .format(dataUltimaModificacao);
 
         return String.format(
-                "%s%s  %2d  %-8s %-8s %8d  %s  %s",
+                "%s%s  %d  %s  %s  %5d  %s  %s",
                 tipo,
                 permissoes,
-                1,                 // links
+                links,
                 proprietario,
                 grupo,
-                tamanhoBytes,
+                (int) tamanhoBytes,
                 data,
                 nome
         );
@@ -503,18 +548,18 @@ public class Diretorio  implements Comandos,Cloneable {
 
     private void printStat() {
     this.tamanhoBytes = getTamanhoBytes();
-        System.out.println("  Diretorio: " + nome);
+        System.out.println("Diretorio: " + nome);
 
         System.out.printf(
-                "  Tamanho: %-15.0f Blocos: %-10d Bloco IO: %-6d %s%n",
+                "Tamanho: %-15d Blocos: %-10d Bloco IO: %-6d %s%n",
                 tamanhoBytes,
-                (int) Math.ceil(tamanhoBytes / bloco),
+                (int) (tamanhoBytes / bloco),
                 4096,
                 tipo
         );
 
         System.out.printf(
-                " Inode: %-12d Links: %d%n",
+                "Inode: %-12d Links: %d%n",
                 inode,
                 diretoriosArquivos.size() + 2
         );
@@ -551,13 +596,13 @@ public class Diretorio  implements Comandos,Cloneable {
 
     @Override
     public void zip(String nomeZip, ArrayList<String> itens) {
-
         if (!nomeZip.endsWith(".zip")) {
             System.out.println("Erro: arquivo zip deve terminar com .zip");
             return;
         }
 
-        Arquivo zip = new Arquivo(nomeZip,this);
+        Arquivo zip = new Arquivo(nomeZip, this);
+        int itensAdicionados = 0;
 
         for (String nomeItem : itens) {
 
@@ -567,6 +612,7 @@ public class Diretorio  implements Comandos,Cloneable {
 
                 if (c.getNome().equals(nomeItem)) {
                     zip.adicionarAoZip(c);
+                    itensAdicionados++;
                     encontrado = true;
                     break;
                 }
@@ -577,14 +623,18 @@ public class Diretorio  implements Comandos,Cloneable {
             }
         }
 
-        diretoriosArquivos.add(zip);
+        if (itensAdicionados == 0) {
+            System.out.println("zip: nenhum item válido para compactar");
+            return;
+        }
 
+        diretoriosArquivos.add(zip);
         System.out.println("Arquivo " + nomeZip + " criado com sucesso.");
+
     }
 
     @Override
     public void unzip(String nomeZip) {
-
         Comandos item = buscarDiretorioArquivo(nomeZip);
 
         if (!(item instanceof Arquivo)) {
@@ -599,11 +649,25 @@ public class Diretorio  implements Comandos,Cloneable {
             return;
         }
 
+        // Cria diretório de descompactação
+        String nomePasta = nomeZip.replace(".zip", "");
+        Diretorio pasta = new Diretorio(nomePasta, this);
+        this.diretoriosArquivos.add(pasta);
+
         for (Comandos c : zipFile.getConteudoZip()) {
-            diretoriosArquivos.add(c);
+            // Clonar cada item dentro da pasta
+            if (c instanceof Arquivo arq) {
+                Arquivo novo = (Arquivo) arq.clonarDiretorioArquivo(pasta);
+                pasta.addFilho(novo);
+            } else if (c instanceof Diretorio dir) {
+                Diretorio novoDir = (Diretorio) dir.clonarDiretorioArquivo(pasta);
+                pasta.addFilho(novoDir);
+            }
         }
 
         System.out.println("Arquivo " + nomeZip + " descompactado com sucesso.");
     }
+
+
 
 }

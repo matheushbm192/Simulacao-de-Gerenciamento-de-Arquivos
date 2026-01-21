@@ -20,13 +20,13 @@ public interface Comandos {
     void find (String nomeDiretorioArquivo);
     void grep(String termo);
     void stat(String nomeDiretorioArquivo);
-    double getTamanhoBytes();
+    int getTamanhoBytes();
     void du(String nomeDiretorio);
     void zip(String nomeZip, ArrayList<String> itens);
     void unzip(String nomeZip);
     void cp(String nomeOrigem,Diretorio destino);
     void mv(String nomeOrigem,Diretorio destino);
-    void diff(Arquivo arquivo2);
+    //void diff(Arquivo arquivo2);
     String detalhes();
     Comandos clonarDiretorioArquivo(Diretorio destino);
     Diretorio getDiretorioPai();

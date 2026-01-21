@@ -270,18 +270,16 @@ public class Terminal {
                     break;
 
                 case "ls":
-                    if (comandos.length == 2 && comandos[1].equals("-l")) {
-
-                        for (Comandos c : atual.getFilhos()) {
-                            if (atual.getFilhos().isEmpty()) {
-                                System.out.println("(diretório vazio)");
-                                break;
-                            }
-                            System.out.println(c.detalhes());
-                        }
-
+                    if (atual.getFilhos().isEmpty()) {
+                        System.out.println("(diretório vazio)");
                     } else {
-                        System.out.println("Argumentos inválidos (ls -l)");
+                        for (Comandos c : atual.getFilhos()) {
+                            if (c instanceof Diretorio) {
+                                System.out.println(((Diretorio) c).detalhes());
+                            } else if (c instanceof Arquivo) {
+                                System.out.println(((Arquivo) c).detalhes());
+                            }
+                        }
                     }
                     break;
                 case "du":
