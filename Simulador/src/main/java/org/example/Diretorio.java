@@ -250,8 +250,6 @@ public class Diretorio  implements Comandos,Cloneable {
     @Override
     public void echo(String texto, String atributo, String nomeArquivo) {
 
-
-
         if (!atributo.equals(">") && !atributo.equals(">>")) {
             System.out.println("echo: operador inválido (use > ou >>)");
             return;
@@ -459,10 +457,17 @@ public class Diretorio  implements Comandos,Cloneable {
         }
     }
 
-    /*@Override
-    public void diff(Arquivo arquivo2) {
+    @Override
+    public void diff(String nomeaArquivo1, String nomeaArquivo2) {
+        Comandos arquivo1 = buscarPorPathParcial(nomeaArquivo1,this);
+        Comandos arquivo2 = buscarPorPathParcial(nomeaArquivo2,this);
 
-    }*/
+        if(arquivo1 instanceof Arquivo arquivoPrincipal && arquivo2 instanceof Arquivo arquivoComparado){
+            arquivoPrincipal.comparar(arquivoComparado);
+        }else{
+            System.out.println("Argumento invalidos os arqumentos devem ser arquivos");
+        }
+    }
 
     private void buscarRecursivo(Comandos atual, String nomeProcurado, String caminhoAtual) {
         if (atual.getNome().equals(nomeProcurado)) {

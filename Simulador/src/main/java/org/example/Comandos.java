@@ -26,7 +26,7 @@ public interface Comandos {
     void unzip(String nomeZip);
     void cp(String nomeOrigem,Diretorio destino);
     void mv(String nomeOrigem,Diretorio destino);
-    //void diff(Arquivo arquivo2);
+    void diff(String pathArquivo1, String pathArquivo2);
     String detalhes();
     Comandos clonarDiretorioArquivo(Diretorio destino);
     Diretorio getDiretorioPai();

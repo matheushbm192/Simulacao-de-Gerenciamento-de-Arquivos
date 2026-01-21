@@ -322,18 +322,12 @@ public class Terminal {
                     }
                     break;
                 case"diff":
-//                    if (comandos.length == 3){
-//                        Comandos arquivo1 = pesquisarNaArvore( root,comandos[1]);
-//                        Comandos arquivo2 = pesquisarNaArvore( root,comandos[2]);
-//                        if(arquivo1 instanceof  Arquivo && arquivo2 instanceof Arquivo){
-//                            arquivo1.diff(arquivo2);
-//                        }else {
-//                            System.out.println("Argumentos Inválidos ambos argumentos devem ser arquivos");
-//                        }
-//                        atual.diff(comandos[1]);
-//                    }else{
-//                        System.out.println("Argumentos Inválidos (diff <arquivo1> <arquivo2>)");
-//                    }
+                    if (comandos.length == 3){
+                        atual.diff(comandos[1],comandos[2]);
+
+                    }else{
+                        System.out.println("Argumentos Inválidos (diff <arquivo1> <arquivo2>)");
+                    }
                     break;
                 case "exit":
                     if(comandos.length == 1){

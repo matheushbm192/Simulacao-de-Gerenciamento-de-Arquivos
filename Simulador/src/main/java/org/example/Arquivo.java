@@ -228,7 +228,7 @@ public class Arquivo implements Comandos {
             return;
         }
 
-        System.out.println(texto);
+        System.out.println(adicionaQuebraLinha(texto));
     }
 
     @Override
@@ -491,11 +491,10 @@ public class Arquivo implements Comandos {
         System.out.println("Erro: du deve ser executado em um diretório.");
     }
 
-    /*@Override
-    public void diff(Arquivo arquivo2) {
+    @Override
+    public void diff(String pathArquivo1, String pathArquivo2) {
 
-    }*/
-
+    }
 
     @Override
     public void zip(String nomeZip, ArrayList<String> itens) {
@@ -554,5 +553,39 @@ public class Arquivo implements Comandos {
     }
     public ArrayList<Comandos> getConteudoZip() {
         return conteudoZip;
+    }
+
+    public void comparar(Arquivo arquivoComparado) {
+        String textoArquivoAtual = this.adicionaQuebraLinha(texto);
+        String textoArquivoComparado = arquivoComparado.adicionaQuebraLinha(arquivoComparado.getTexto());
+
+        ArrayList<String> linhasDiferentes = new ArrayList<>();
+
+        String[] atual = textoArquivoAtual.split("\n");
+        String[] comparado = textoArquivoComparado.split("\n");
+
+        int tamanhoMinimo = Math.min(atual.length, comparado.length);
+
+        //Compara linha a linha
+        for (int i = 0; i < tamanhoMinimo; i++) {
+            if (!atual[i].equals(comparado[i])) {
+                linhasDiferentes.add("Linha " + (i + 1) + " | Atual: " + atual[i] + " | Comparado: " + comparado[i]);
+            }
+        }
+
+        //Adiciona linhas extras
+        if (atual.length > comparado.length) {
+            for (int i = tamanhoMinimo; i < atual.length; i++) {
+                linhasDiferentes.add("Linha " + (i + 1) + " | Atual: " + atual[i]);
+            }
+        } else if (comparado.length > atual.length) {
+            for (int i = tamanhoMinimo; i < comparado.length; i++) {
+                linhasDiferentes.add("Linha " + (i + 1) + " | Comparado: " + comparado[i]);
+            }
+        }
+
+        for(String linha : linhasDiferentes){
+            System.out.println(linha);
+        }
     }
 }
