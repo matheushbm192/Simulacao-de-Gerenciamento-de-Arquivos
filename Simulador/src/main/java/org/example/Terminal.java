@@ -398,17 +398,24 @@ public class Terminal {
 
     public static Comandos pesquisarNaArvore(Comandos atual, String nomeDestino) {
 
-        if (atual.getNome().equals(nomeDestino)) {
+        if (atual == null || nomeDestino == null) {
+            return null;
+        }
+
+        if (nomeDestino.equals(atual.getNome())) {
             return atual;
         }
-        for (Comandos diretorioArquivo : atual.getFilhos()) {
-            Comandos encontrado = pesquisarNaArvore(diretorioArquivo, nomeDestino);
-            if (encontrado != null) {
-                return encontrado;
 
+        if (atual.getFilhos() != null) {
+            for (Comandos diretorioArquivo : atual.getFilhos()) {
+                Comandos encontrado = pesquisarNaArvore(diretorioArquivo, nomeDestino);
+                if (encontrado != null) {
+                    return encontrado;
+                }
             }
         }
 
         return null;
+
     }
 }

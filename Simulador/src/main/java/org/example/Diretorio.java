@@ -218,14 +218,19 @@ public class Diretorio  implements Comandos,Cloneable {
     }
 
     public Arquivo validarNomeArquivo(String nomeArquivo,Diretorio diretorioRaiz) {
+        String[] nomeSeparado = nomeArquivo.trim().split("\\.");
         for (Comandos arquivos : diretorioRaiz.diretoriosArquivos){
             if (arquivos.getNome().equals(nomeArquivo)){
-                nomeArquivo += diretorioRaiz.numeroArquivo;
+
+                String nomeNumero = nomeSeparado[0].concat(String.valueOf(diretorioRaiz.numeroArquivo)) ;
+                nomeArquivo = nomeNumero.concat(".").concat(nomeSeparado[1]);
                 diretorioRaiz.numeroArquivo++;
                 break;
             }
         }
+
         Arquivo arquivo = new Arquivo(nomeArquivo,diretorioRaiz);
+        //arquivo.setTipo(nomeSeparado[1]);
         return arquivo;
     }
 
