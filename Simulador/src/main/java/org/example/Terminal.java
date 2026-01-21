@@ -24,8 +24,6 @@ public class Terminal {
 
             String comando = entrada.nextLine();
 
-            historico.add(comando);
-
             //mantém historico de comandos digitados
             historico.add(comando);
 

@@ -195,23 +195,36 @@ public class Diretorio  implements Comandos,Cloneable {
     //todo:rever implemntação
     @Override
     public void echo(String texto, String atributo, String nomeArquivo) {
+
+        if (!atributo.equals(">") && !atributo.equals(">>")) {
+            System.out.println("echo: operador inválido (use > ou >>)");
+            return;
+        }
+
         Comandos diretorioArquivo = buscarDiretorioArquivo(nomeArquivo);
 
-        if(diretorioArquivo instanceof Arquivo arquivo){
-            if (">>".equals(atributo)){
+        // Arquivo já existe
+        if (diretorioArquivo instanceof Arquivo arquivo) {
+
+            if (atributo.equals(">>")) {
                 arquivo.textoIncrement(texto);
-
-            }else if(">".equals(atributo)){
+            } else {
                 arquivo.escrever(texto);
-
             }
-        }else{
-            //se não existir, cria
+
+        }
+        // Arquivo NÃO existe → cria
+        else {
+
             Arquivo novo = new Arquivo(nomeArquivo);
+
+            // tanto > quanto >> criam arquivo
             novo.escrever(texto);
+
             diretoriosArquivos.add(novo);
         }
-    }
+
+}
 
     @Override
     public void cat(String nomeArquivo) {
@@ -229,8 +242,6 @@ public class Diretorio  implements Comandos,Cloneable {
         if (diretorioArquivo instanceof Diretorio dir) {
             if (dir.getFilhos().isEmpty()) {
                 diretoriosArquivos.remove(dir);
-            } else {
-                System.out.println("rm: diretório não está vazio");
             }
         } else if (diretorioArquivo != null) {
             diretoriosArquivos.remove(diretorioArquivo);
@@ -300,7 +311,7 @@ public class Diretorio  implements Comandos,Cloneable {
         Comandos diretorioArquivo = buscarDiretorioArquivo(nomeDiretorio);
         if(diretorioArquivo instanceof Diretorio){
             int quantidadeBlocos = (int) getTamanhoBytes() / bloco;
-            System.out.println(quantidadeBlocos + "/"+nomeDiretorio);
+            System.out.println(quantidadeBlocos + "blocos");
         } else if (diretorioArquivo instanceof Arquivo arquivo) {
             arquivo.du(nomeDiretorio);
         }else{
@@ -392,8 +403,10 @@ public class Diretorio  implements Comandos,Cloneable {
             System.out.println(caminhoAtual);
         }
 
-        for (Comandos c : atual.getFilhos()) {
-            buscarRecursivo(c, nomeProcurado, caminhoAtual + "\\" + c.getNome());
+        if(atual instanceof Diretorio diretorioAtual) {
+            for (Comandos c : diretorioAtual.getFilhos()) {
+                buscarRecursivo(c, nomeProcurado, caminhoAtual + "\\" + c.getNome());
+            }
         }
     }
 
@@ -432,18 +445,25 @@ public class Diretorio  implements Comandos,Cloneable {
 
     public String detalhes() {
 
-        String tipo = "d";
+        String tipo = "-";
+
         String permissoes =
                 (leitura ? "r" : "-") +
                         (escrita ? "w" : "-") +
                         (execucao ? "x" : "-");
 
+        String data = new java.text.SimpleDateFormat("yyyy-MM-dd")
+                .format(dataUltimaModificacao);
+
         return String.format(
-                "%s%s  %s  %d  %s",
+                "%s%s  %2d  %-8s %-8s %8d  %s  %s",
                 tipo,
                 permissoes,
+                1,                 // links
                 proprietario,
-                diretoriosArquivos.size(),
+                grupo,
+                tamanhoBytes,
+                data,
                 nome
         );
     }

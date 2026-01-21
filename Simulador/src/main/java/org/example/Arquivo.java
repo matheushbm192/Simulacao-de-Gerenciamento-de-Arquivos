@@ -358,31 +358,27 @@ public class Arquivo implements Comandos {
 
     private void printStat() {
 
-        System.out.println("  Arquivo: " + nome);
+        System.out.println("Arquivo: " + nome);
 
-        System.out.printf(
-                "  Tamanho: %-15.0f Blocos: %-10d Bloco IO: %-6d %s%n",
-                tamanhoBytes,
-                (int) Math.ceil(tamanhoBytes / bloco),
-                4096,
-                tipo
+        System.out.println(
+                "Tamanho: " + tamanhoBytes +
+                        "  Blocos: " + (int) Math.ceil(tamanhoBytes / bloco) +
+                        "  Bloco IO: 4096 " +
+                        tipo
         );
 
-        System.out.printf(
-                "Dispositivo: %-15s Inode: %-12d Links: %d%n",
-                "802h/2050d",
-                inode,
-                1
+        System.out.println(
+                "Dispositivo: 802h/2050d" +
+                        "  Inode: " + inode +
+                        "  Links: 1"
         );
 
-        //TODO: Ajustar Permissão
-        System.out.printf(
-                "Acesso: (%s/%s)  UID: (1000/%s)   GID: (1000/%s)%n",
-                permissoesOctal,
-                permissoesSimbolicas,
-                proprietario,
-                grupo
+        System.out.println(
+                "Acesso: (" + permissoesOctal + "/" + permissoesSimbolicas + ")" +
+                        "  UID: (1000/" + proprietario + ")" +
+                        "  GID: (1000/" + grupo + ")"
         );
+
 
         System.out.println(
                 "Acesso: " + dataUltimoAcesso
@@ -397,7 +393,7 @@ public class Arquivo implements Comandos {
         );
 
         System.out.println(
-                " Criação: " + dataCriacao
+                "Criação: " + dataCriacao
         );
     }
     @Override
