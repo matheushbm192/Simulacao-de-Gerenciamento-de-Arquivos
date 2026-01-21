@@ -27,5 +27,5 @@ public interface Comandos {
     void cp(String nomeOrigem,Diretorio destino);
     void mv(String nomeOrigem,Diretorio destino);
     void diff(Arquivo arquivo2);
-    Comandos clonarDiretorioArquivo();
+    Comandos clonarDiretorioArquivo(Diretorio destino);
 }

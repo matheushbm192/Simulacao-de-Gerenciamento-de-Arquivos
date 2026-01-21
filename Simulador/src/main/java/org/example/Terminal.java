@@ -13,7 +13,7 @@ public class Terminal {
         ArrayList<String> historico = new ArrayList<>();
 
         Comandos atual;
-        Comandos root = new Diretorio("C:");
+        Comandos root = new Diretorio("C:",null);
 
         caminho.add(root);
         atual = root;

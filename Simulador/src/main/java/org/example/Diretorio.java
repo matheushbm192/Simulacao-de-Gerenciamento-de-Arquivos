@@ -23,9 +23,10 @@ public class Diretorio  implements Comandos,Cloneable {
     private final int bloco = 512;
     private static long contadorInode = 1;
     private ArrayList<Comandos> diretoriosArquivos = new ArrayList<>();
-
-    public Diretorio(String nomeDiretorio){
+    private Diretorio diretorioPai;
+    public Diretorio(String nomeDiretorio, Diretorio diretorioPai){
         this.nome = nomeDiretorio;
+        this.diretorioPai = diretorioPai;
         this.inode = SistemaOperacional.getInstance().gerarInode();
     }
 
@@ -122,6 +123,14 @@ public class Diretorio  implements Comandos,Cloneable {
         this.diretoriosArquivos = diretoriosArquivos;
     }
 
+    public Diretorio getDiretorioPai() {
+        return diretorioPai;
+    }
+
+    public void setDiretorioPai(Diretorio diretorioPai) {
+        this.diretorioPai = diretorioPai;
+    }
+
     public  Comandos buscarPorPathParcial(String path, Comandos atual){
         String[] nomesDiretoriosArquivos = path.split("\\\\");
         if(nomesDiretoriosArquivos.length == 1 ){
@@ -153,7 +162,7 @@ public class Diretorio  implements Comandos,Cloneable {
 
     @Override
     public void mkdir(String nomeDiretorio){
-        diretoriosArquivos.add(new Diretorio(nomeDiretorio));
+        diretoriosArquivos.add(new Diretorio(nomeDiretorio,this));
     }
 
     @Override
@@ -195,12 +204,10 @@ public class Diretorio  implements Comandos,Cloneable {
         Comandos diretorioArquivo = buscarPorPathParcial(nomeDiretorio,this);
 
         if(diretorioArquivo instanceof Diretorio diretorio){
-    // tenho que acessar o diretorio certo
 
             if(diretorio.diretoriosArquivos.isEmpty() ){
-                int index = diretoriosArquivos.indexOf(diretorioArquivo);
-                diretoriosArquivos.remove(index);
-
+                Diretorio diretorioPai = diretorio.getDiretorioPai();
+                diretorioPai.diretoriosArquivos.remove(diretorioArquivo);
             }
         }
     }
@@ -260,13 +267,7 @@ public class Diretorio  implements Comandos,Cloneable {
     public void rm(String nomeDiretorioArquivo) {
         Comandos diretorioArquivo = buscarDiretorioArquivo(nomeDiretorioArquivo);
 
-        if (diretorioArquivo instanceof Diretorio dir) {
-            if (dir.getFilhos().isEmpty()) {
-                diretoriosArquivos.remove(dir);
-            }
-        } else if (diretorioArquivo != null) {
             diretoriosArquivos.remove(diretorioArquivo);
-        }
 
     }
 
@@ -346,16 +347,16 @@ public class Diretorio  implements Comandos,Cloneable {
         Comandos diretorioArquivoClonado = null;
 
         if (this.nome.equals(nomeOrigem)) {
-             diretorioArquivoClonado = clonarDiretorioArquivo();
+             diretorioArquivoClonado = clonarDiretorioArquivo(destino);
 
         }else{
             Comandos diretorioArquivo = buscarDiretorioArquivo(nomeOrigem);
 
             if(diretorioArquivo instanceof Diretorio diretorioOrigem) {
-                diretorioArquivoClonado = diretorioOrigem.clonarDiretorioArquivo();
+                diretorioArquivoClonado = diretorioOrigem.clonarDiretorioArquivo(destino);
 
             }else if(diretorioArquivo instanceof Arquivo arquivoOrigem){
-                diretorioArquivoClonado = arquivoOrigem.clonarDiretorioArquivo();
+                diretorioArquivoClonado = arquivoOrigem.clonarDiretorioArquivo(destino);
             }
         }
         if(diretorioArquivoClonado != null){
@@ -364,8 +365,8 @@ public class Diretorio  implements Comandos,Cloneable {
 
     }
 
-    public Comandos clonarDiretorioArquivo(){
-        Diretorio clone = new Diretorio(this.nome);
+    public Comandos clonarDiretorioArquivo(Diretorio destino){
+        Diretorio clone = new Diretorio(this.nome, destino);
 
         // Identidade
         clone.tipo = "diretorio";
@@ -392,7 +393,7 @@ public class Diretorio  implements Comandos,Cloneable {
 
         // Clonagem profunda dos filhos (Composite)
         for (Comandos diretorioArquivo : this.diretoriosArquivos) {
-            Comandos filhoClone = diretorioArquivo.clonarDiretorioArquivo();
+            Comandos filhoClone = diretorioArquivo.clonarDiretorioArquivo(clone);
             clone.diretoriosArquivos.add(filhoClone);
         }
 

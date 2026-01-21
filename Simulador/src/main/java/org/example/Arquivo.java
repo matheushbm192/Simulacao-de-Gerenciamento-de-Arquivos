@@ -405,7 +405,7 @@ public class Arquivo implements Comandos {
     public void cp(String nomeOrigem, Diretorio destino) {
 
         if(this.nome.equals(nomeOrigem)){
-          destino.addFilho(this.clonarDiretorioArquivo());
+          destino.addFilho(this.clonarDiretorioArquivo(destino));
         }else{
             System.out.println("Argumento invalido");
         }
@@ -413,7 +413,7 @@ public class Arquivo implements Comandos {
     }
 
     @Override
-    public Comandos clonarDiretorioArquivo() {
+    public Comandos clonarDiretorioArquivo(Diretorio destino) {
         //todo: fazer verificação se destino existe, se não existir fazer algo quanto ao nome da copia
         Arquivo clone = new Arquivo( this.nome);
         // Identidade
