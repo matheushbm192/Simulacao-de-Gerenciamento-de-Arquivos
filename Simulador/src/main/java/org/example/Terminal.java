@@ -355,7 +355,14 @@ public class Terminal {
                         atual.zip(nomeZip, itens);
                     }
                     break;
+                case "history":
+                    if(comandos.length == 1){
+                        for (int i = 0; i < historico.size()-1 ; i++) {
+                            System.out.println(historico.get(i));
+                        }
 
+                    }
+                    break;
                 case "unzip":
                     if (comandos.length == 2) {
                         atual.unzip(comandos[1]);
