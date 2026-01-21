@@ -241,7 +241,7 @@ public class Diretorio  implements Comandos,Cloneable {
 
     @Override
     public void rename(String nomeDiretorioArquivo, String novoNomeDiretorioArquivo) {
-         Comandos diretorioArquivo = buscarDiretorioArquivo(nomeDiretorioArquivo);
+         Comandos diretorioArquivo = buscarPorPathParcial(nomeDiretorioArquivo,this);
          if(diretorioArquivo != null){
              diretorioArquivo.setNome(novoNomeDiretorioArquivo);
          }
@@ -255,7 +255,7 @@ public class Diretorio  implements Comandos,Cloneable {
             return;
         }
 
-        Comandos diretorioArquivo = buscarDiretorioArquivo(nomeArquivo);
+        Comandos diretorioArquivo = buscarPorPathParcial(nomeArquivo,this);
 
         if (isZip()) {
             System.out.println("echo: não é possível escrever em arquivo zip");
@@ -288,7 +288,7 @@ public class Diretorio  implements Comandos,Cloneable {
     @Override
     public void cat(String nomeArquivo) {
 
-        Comandos diretorioArquivo = buscarDiretorioArquivo(nomeArquivo);
+        Comandos diretorioArquivo = buscarPorPathParcial(nomeArquivo,this);
 
         if (isZip()) {
             System.out.println("cat: não é possível ler arquivo zip");
@@ -315,7 +315,7 @@ public class Diretorio  implements Comandos,Cloneable {
 
     @Override
     public void head(String nomeArquivo, String numeroDeLinhas) {
-        Comandos diretorioArquivo = buscarDiretorioArquivo(nomeArquivo);
+        Comandos diretorioArquivo = buscarPorPathParcial(nomeArquivo,this);
         if(diretorioArquivo instanceof Arquivo arquivo){
             arquivo.head(nomeArquivo,numeroDeLinhas);
         }
@@ -323,7 +323,7 @@ public class Diretorio  implements Comandos,Cloneable {
 
     @Override
     public void tail(String nomeArquivo, String numeroDeLinhas) {
-        Comandos diretorioArquivo = buscarDiretorioArquivo(nomeArquivo);
+        Comandos diretorioArquivo = buscarPorPathParcial(nomeArquivo,this);
         if(diretorioArquivo instanceof Arquivo arquivo){
             arquivo.tail(nomeArquivo,numeroDeLinhas);
         }
@@ -331,7 +331,7 @@ public class Diretorio  implements Comandos,Cloneable {
 
     @Override
     public void wc(String nomeArquivo) {
-        Comandos diretorioArquivo = buscarDiretorioArquivo(nomeArquivo);
+        Comandos diretorioArquivo = buscarPorPathParcial(nomeArquivo,this);
         if(diretorioArquivo instanceof Arquivo arquivo){
             arquivo.wc(nomeArquivo);
         }
@@ -353,7 +353,7 @@ public class Diretorio  implements Comandos,Cloneable {
         if(this.nome.equals(nomeDiretorioArquivo)){
             diretorio = this;
         }else{
-            Comandos diretorioArquivo = buscarDiretorioArquivo(nomeDiretorioArquivo);
+            Comandos diretorioArquivo = buscarPorPathParcial(nomeDiretorioArquivo,this);
             if (diretorioArquivo instanceof Diretorio){
                 diretorio = (Diretorio) diretorioArquivo;
             }else if(diretorioArquivo instanceof Arquivo arquivo){
@@ -372,7 +372,7 @@ public class Diretorio  implements Comandos,Cloneable {
 
     @Override
     public void du(String nomeDiretorio) {
-        Comandos diretorioArquivo = buscarDiretorioArquivo(nomeDiretorio);
+        Comandos diretorioArquivo = buscarPorPathParcial(nomeDiretorio,this);
         if(diretorioArquivo instanceof Diretorio){
             int quantidadeBlocos = (int) getTamanhoBytes() / bloco;
             System.out.println(quantidadeBlocos + " blocos");
@@ -392,7 +392,7 @@ public class Diretorio  implements Comandos,Cloneable {
              diretorioArquivoClonado = clonarDiretorioArquivo(destino);
 
         }else{
-            Comandos diretorioArquivo = buscarDiretorioArquivo(nomeOrigem);
+            Comandos diretorioArquivo = buscarPorPathParcial(nomeOrigem,this);
 
             if(diretorioArquivo instanceof Diretorio diretorioOrigem) {
                 diretorioArquivoClonado = diretorioOrigem.clonarDiretorioArquivo(destino);
@@ -448,7 +448,7 @@ public class Diretorio  implements Comandos,Cloneable {
     @Override
     public void mv(String nomeOrigem, Diretorio destino) {
 
-        Comandos diretorioArquivoMover = buscarDiretorioArquivo(nomeOrigem);
+        Comandos diretorioArquivoMover = buscarPorPathParcial(nomeOrigem,this);
 
         if(diretorioArquivoMover != null){
             destino.addFilho(diretorioArquivoMover);
@@ -513,7 +513,6 @@ public class Diretorio  implements Comandos,Cloneable {
         return valor;
     }
 
-
     public String detalhes() {
 
         String tipo = "d";
@@ -547,8 +546,6 @@ public class Diretorio  implements Comandos,Cloneable {
     private void comandoInvalido(String comando) {
         System.out.println(comando + ": operação inválida para diretório");
     }
-
-
 
 
     private void printStat() {
@@ -595,10 +592,6 @@ public class Diretorio  implements Comandos,Cloneable {
         );
     }
 
-    private long gerarInode() {
-        return contadorInode++;
-    }
-
     @Override
     public void zip(String nomeZip, ArrayList<String> itens) {
         if (!nomeZip.endsWith(".zip")) {
@@ -640,7 +633,7 @@ public class Diretorio  implements Comandos,Cloneable {
 
     @Override
     public void unzip(String nomeZip) {
-        Comandos item = buscarDiretorioArquivo(nomeZip);
+        Comandos item = buscarPorPathParcial(nomeZip,this);
 
         if (!(item instanceof Arquivo)) {
             System.out.println("unzip: arquivo não encontrado");
@@ -657,7 +650,8 @@ public class Diretorio  implements Comandos,Cloneable {
         // Cria diretório de descompactação
         String nomePasta = nomeZip.replace(".zip", "");
         Diretorio pasta = new Diretorio(nomePasta, this);
-        this.diretoriosArquivos.add(pasta);
+        item.getDiretorioPai().diretoriosArquivos.add(pasta);
+
 
         for (Comandos c : zipFile.getConteudoZip()) {
             // Clonar cada item dentro da pasta
