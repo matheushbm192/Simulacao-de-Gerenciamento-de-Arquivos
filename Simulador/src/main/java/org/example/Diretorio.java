@@ -26,10 +26,13 @@ public class Diretorio  implements Comandos,Cloneable {
     private ArrayList<Comandos> diretoriosArquivos = new ArrayList<>();
     private Diretorio diretorioPai;
     private boolean zip;
+    private int numeroDiretorio = 1;
+    private int numeroArquivo = 1;
+
 
 
     public Diretorio(String nomeDiretorio, Diretorio diretorioPai){
-        this.nome = nomeDiretorio;
+        this.nome = nomeDiretorio.trim();
         this.diretorioPai = diretorioPai;
         this.inode = SistemaOperacional.getInstance().gerarInode();
         this.zip = nome.endsWith(".zip");
@@ -188,12 +191,27 @@ public class Diretorio  implements Comandos,Cloneable {
     }
 
 
+
     @Override
     public void mkdir(String nomeDiretorio){
+        for (Comandos diretorios : diretoriosArquivos){
+            if (diretorios.getNome().equals(nomeDiretorio)){
+                nomeDiretorio += numeroDiretorio;
+                numeroDiretorio++;
+                break;
+            }
+        }
         diretoriosArquivos.add(new Diretorio(nomeDiretorio,this));
     }
     @Override
     public void touch(String nomeArquivo) {
+        for (Comandos arquivos : diretoriosArquivos){
+            if (arquivos.getNome().equals(nomeArquivo)){
+                nomeArquivo += numeroArquivo;
+                numeroArquivo++;
+                break;
+            }
+        }
         diretoriosArquivos.add(new Arquivo(nomeArquivo,this));
     }
 

@@ -29,7 +29,7 @@ public class Arquivo implements Comandos {
     private Diretorio diretorioPai;
 
     public Arquivo(String nome,Diretorio diretorioPai) {
-        this.nome = nome;
+        this.nome = nome.trim();
         this.inode = SistemaOperacional.getInstance().gerarInode();
         this.texto = "";
         this.diretorioPai = diretorioPai;
