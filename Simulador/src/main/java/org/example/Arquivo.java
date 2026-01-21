@@ -202,6 +202,7 @@ public class Arquivo implements Comandos {
     @Override
     public void mkdir(String nomeDiretorio) {
         System.out.println("Erro: arquivo não pode conter diretórios.");
+
     }
 
     @Override

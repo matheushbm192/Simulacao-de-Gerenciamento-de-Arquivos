@@ -194,25 +194,39 @@ public class Diretorio  implements Comandos,Cloneable {
 
     @Override
     public void mkdir(String nomeDiretorio){
-        for (Comandos diretorios : diretoriosArquivos){
+        Diretorio  diretorio = validarNomeDiretorio(nomeDiretorio,this);
+        diretoriosArquivos.add(diretorio);
+    }
+
+    public Diretorio validarNomeDiretorio(String nomeDiretorio,Diretorio diretorioRaiz){
+        for (Comandos diretorios : diretorioRaiz.diretoriosArquivos){
             if (diretorios.getNome().equals(nomeDiretorio)){
-                nomeDiretorio += numeroDiretorio;
-                numeroDiretorio++;
+                nomeDiretorio += diretorioRaiz.numeroDiretorio;
+                diretorioRaiz.numeroDiretorio++;
                 break;
             }
         }
-        diretoriosArquivos.add(new Diretorio(nomeDiretorio,this));
+
+        Diretorio diretorio = new Diretorio(nomeDiretorio,diretorioRaiz);
+        return diretorio;
     }
+
     @Override
     public void touch(String nomeArquivo) {
-        for (Comandos arquivos : diretoriosArquivos){
+       Arquivo arquivo =  validarNomeArquivo(nomeArquivo,this);
+        diretoriosArquivos.add(arquivo);
+    }
+
+    public Arquivo validarNomeArquivo(String nomeArquivo,Diretorio diretorioRaiz) {
+        for (Comandos arquivos : diretorioRaiz.diretoriosArquivos){
             if (arquivos.getNome().equals(nomeArquivo)){
-                nomeArquivo += numeroArquivo;
-                numeroArquivo++;
+                nomeArquivo += diretorioRaiz.numeroArquivo;
+                diretorioRaiz.numeroArquivo++;
                 break;
             }
         }
-        diretoriosArquivos.add(new Arquivo(nomeArquivo,this));
+        Arquivo arquivo = new Arquivo(nomeArquivo,diretorioRaiz);
+        return arquivo;
     }
 
     @Override
@@ -293,11 +307,10 @@ public class Diretorio  implements Comandos,Cloneable {
         // Arquivo NÃO existe → cria
         else {
 
-            Arquivo novo = new Arquivo(nomeArquivo,this);
+            Arquivo novo = validarNomeArquivo(nomeArquivo,this);
 
             // tanto > quanto >> criam arquivo
             novo.escrever(texto);
-
             diretoriosArquivos.add(novo);
         }
 
@@ -426,7 +439,7 @@ public class Diretorio  implements Comandos,Cloneable {
     }
 
     public Comandos clonarDiretorioArquivo(Diretorio destino){
-        Diretorio clone = new Diretorio(this.nome, destino);
+        Diretorio clone = validarNomeDiretorio(this.nome,this);
 
         // Identidade
         clone.tipo = "diretorio";
@@ -639,7 +652,7 @@ public class Diretorio  implements Comandos,Cloneable {
             return;
         }
 
-        Arquivo zip = new Arquivo(nomeZip, this);
+        Arquivo zip = validarNomeArquivo(nomeZip,this);
         int itensAdicionados = 0;
 
         for (String nomeItem : itens) {
@@ -689,7 +702,7 @@ public class Diretorio  implements Comandos,Cloneable {
 
         // Cria diretório de descompactação
         String nomePasta = nomeZip.replace(".zip", "");
-        Diretorio pasta = new Diretorio(nomePasta, this);
+        Diretorio pasta = validarNomeDiretorio(nomePasta,item.getDiretorioPai());
         item.getDiretorioPai().diretoriosArquivos.add(pasta);
 
 
