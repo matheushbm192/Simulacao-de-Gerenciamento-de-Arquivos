@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class Diretorio  implements Comandos,Cloneable {
+
     private String nome;
     private String tipo;
     private int tamanhoBytes;
@@ -31,7 +32,6 @@ public class Diretorio  implements Comandos,Cloneable {
         this.nome = nomeDiretorio;
         this.diretorioPai = diretorioPai;
         this.inode = SistemaOperacional.getInstance().gerarInode();
-        this.zip = nome.endsWith(".zip");
         this.zip = nome.endsWith(".zip");
 
         if (zip) {
@@ -523,7 +523,7 @@ public class Diretorio  implements Comandos,Cloneable {
                         (execucao ? "x" : "-") +
                         "r--r--"; // grupo + outros (exemplo fixo)
 
-        int links = 1;
+        int links = diretoriosArquivos.size() + 2;
         String grupo = "group";
 
         String data = new java.text.SimpleDateFormat("yyyy-MM-dd")
@@ -542,55 +542,77 @@ public class Diretorio  implements Comandos,Cloneable {
         );
     }
 
-    // todo: usar esse método depois onde os comandos são inválidos para diretório, vai facilitar
     private void comandoInvalido(String comando) {
         System.out.println(comando + ": operação inválida para diretório");
     }
 
 
     private void printStat() {
-    this.tamanhoBytes = getTamanhoBytes();
-        System.out.println("Diretorio: " + nome);
+            this.tamanhoBytes = getTamanhoBytes();
 
-        System.out.printf(
-                "Tamanho: %-15d Blocos: %-10d Bloco IO: %-6d %s%n",
-                tamanhoBytes,
-                (int) (tamanhoBytes / bloco),
-                4096,
-                tipo
-        );
+            // Tipo (d para diretório, - para arquivo)
+            String tipo = (this instanceof Diretorio) ? "d" : "-";
 
-        System.out.printf(
-                "Inode: %-12d Links: %d%n",
-                inode,
-                diretoriosArquivos.size() + 2
-        );
+            // Permissões simbólicas
+            String permissoesUsuario =
+                    (leitura ? "r" : "-") +
+                            (escrita ? "w" : "-") +
+                            (execucao ? "x" : "-");
 
-        //TODO: Ajustar Permissão
-        System.out.printf(
-                "Acesso: (%s/%s)  UID: (1000/%s)   GID: (1000/%s)%n",
-                permissoesOctal,
-                permissoesSimbolicas,
-                proprietario,
-                grupo
-        );
+            // Permissões fixas para grupo e outros (exemplo)
+            String permissoesGrupoOutros = "r--r--";
 
-        System.out.println(
-                "Acesso: " + dataUltimoAcesso
-        );
+            String permissoesSimbolicas = permissoesUsuario + permissoesGrupoOutros;
 
-        System.out.println(
-                "Modificação: " + dataUltimaModificacao
-        );
+            // Permissões octal
+            int octalUsuario = (leitura ? 4 : 0) + (escrita ? 2 : 0) + (execucao ? 1 : 0);
+            int octalGrupo = 4;  // r--
+            int octalOutros = 4;  // r--
+            String permissoesOctal = String.format("%d%d%d", octalUsuario, octalGrupo, octalOutros);
 
-        System.out.println(
-                "Alteração: " + dataAlteracaoMetadados
-        );
+            // Links
+            int links = (this instanceof Diretorio) ? diretoriosArquivos.size() + 2 : 1;
 
-        System.out.println(
-                "Criação: " + dataCriacao
-        );
-    }
+            // Grupo fixo
+            String grupo = "group";
+
+            // Datas formatadas (ano e hora)
+            String dataModificacao = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm").format(dataUltimaModificacao);
+            String dataAcesso = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm").format(dataUltimoAcesso);
+            String dataAlteracao = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm").format(dataAlteracaoMetadados);
+            String dataCriacaoStr = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm").format(dataCriacao);
+
+
+            System.out.printf(
+                    "Tamanho: %-15d Blocos: %-10d Bloco IO: %-6d %s%n",
+                    (int) tamanhoBytes,
+                    (int) Math.ceil(((double) tamanhoBytes) / ((double) bloco)),
+                    4096,
+                    tipo
+            );
+
+            System.out.printf(
+                    "Inode: %-12d Links: %d%n",
+                    inode,
+                    links
+            );
+
+            System.out.printf(
+                    "Acesso: (%s/%s)  UID: (1000/%s)   GID: (1000/%s)%n",
+                    permissoesOctal,
+                    permissoesSimbolicas,
+                    proprietario,
+                    grupo
+            );
+
+            System.out.println("Acesso:      " + dataAcesso);
+            System.out.println("Modificação: " + dataModificacao);
+            System.out.println("Alteração:   " + dataAlteracao);
+            System.out.println("Criação:     " + dataCriacaoStr);
+        }
+
+
+
 
     @Override
     public void zip(String nomeZip, ArrayList<String> itens) {
