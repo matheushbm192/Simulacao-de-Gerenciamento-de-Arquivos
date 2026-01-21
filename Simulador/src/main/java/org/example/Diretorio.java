@@ -174,7 +174,7 @@ public class Diretorio  implements Comandos,Cloneable {
 
     @Override
     public void touch(String nomeArquivo) {
-        diretoriosArquivos.add(new Arquivo(nomeArquivo));
+        diretoriosArquivos.add(new Arquivo(nomeArquivo,this));
     }
 
     private void imprimirTree(Diretorio dir, int nivel) {
@@ -244,7 +244,7 @@ public class Diretorio  implements Comandos,Cloneable {
         // Arquivo NÃO existe → cria
         else {
 
-            Arquivo novo = new Arquivo(nomeArquivo);
+            Arquivo novo = new Arquivo(nomeArquivo,this);
 
             // tanto > quanto >> criam arquivo
             novo.escrever(texto);
@@ -265,9 +265,14 @@ public class Diretorio  implements Comandos,Cloneable {
 
     @Override
     public void rm(String nomeDiretorioArquivo) {
-        Comandos diretorioArquivo = buscarDiretorioArquivo(nomeDiretorioArquivo);
+        Comandos diretorioArquivo = buscarPorPathParcial(nomeDiretorioArquivo,this);
 
-            diretoriosArquivos.remove(diretorioArquivo);
+        if(diretorioArquivo != null){
+            Diretorio diretorioPai = diretorioArquivo.getDiretorioPai();
+            diretorioPai.diretoriosArquivos.remove(diretorioArquivo);
+        }
+
+
 
     }
 
@@ -554,7 +559,7 @@ public class Diretorio  implements Comandos,Cloneable {
             return;
         }
 
-        Arquivo zip = new Arquivo(nomeZip);
+        Arquivo zip = new Arquivo(nomeZip,this);
 
         for (String nomeItem : itens) {
 

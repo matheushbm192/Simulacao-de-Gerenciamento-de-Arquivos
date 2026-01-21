@@ -28,4 +28,5 @@ public interface Comandos {
     void mv(String nomeOrigem,Diretorio destino);
     void diff(Arquivo arquivo2);
     Comandos clonarDiretorioArquivo(Diretorio destino);
+    Diretorio getDiretorioPai();
 }

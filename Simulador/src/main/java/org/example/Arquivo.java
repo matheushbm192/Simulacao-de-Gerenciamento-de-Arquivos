@@ -26,14 +26,14 @@ public class Arquivo implements Comandos {
     private final int bloco = 512;
     private boolean zip;
     private ArrayList<Comandos> conteudoZip = new ArrayList<>();
-
+    private Diretorio diretorioPai;
 
     //todo: arrumar o construtor pois em sua criação ele precisa ter mais informações
-    public Arquivo(String nome) {
+    public Arquivo(String nome,Diretorio diretorioPai) {
         this.nome = nome;
         this.inode = SistemaOperacional.getInstance().gerarInode();
         this.texto = "";
-
+        this.diretorioPai = diretorioPai;
         this.zip = nome.endsWith(".zip");
         this.tipo = "-";
 
@@ -356,6 +356,15 @@ public class Arquivo implements Comandos {
         return tamanhoBytes;
     }
 
+    @Override
+    public Diretorio getDiretorioPai() {
+        return diretorioPai;
+    }
+
+    public void setDiretorioPai(Diretorio diretorioPai) {
+        this.diretorioPai = diretorioPai;
+    }
+
     private void printStat() {
 
         System.out.println("Arquivo: " + nome);
@@ -415,7 +424,7 @@ public class Arquivo implements Comandos {
     @Override
     public Comandos clonarDiretorioArquivo(Diretorio destino) {
         //todo: fazer verificação se destino existe, se não existir fazer algo quanto ao nome da copia
-        Arquivo clone = new Arquivo( this.nome);
+        Arquivo clone = new Arquivo( this.nome,destino);
         // Identidade
         clone.tipo = this.tipo;
 
