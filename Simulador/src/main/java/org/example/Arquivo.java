@@ -368,6 +368,7 @@ public class Arquivo implements Comandos {
 
     @Override
     public int getTamanhoBytes() {
+        atualizarTamanho();
         return tamanhoBytes;
     }
 
@@ -382,43 +383,68 @@ public class Arquivo implements Comandos {
 
     private void printStat() {
 
-        System.out.println("Arquivo: " + nome);
+        this.tamanhoBytes = getTamanhoBytes();
 
-        System.out.println(
-                "Tamanho: " + tamanhoBytes +
-                        "  Blocos: " + (int)(tamanhoBytes / bloco) +
-                        "  Bloco IO: 4096 " +
-                        tipo
+        // Tipo (d para diretório, - para arquivo)
+        String tipo = "-";
+
+        // Permissões simbólicas
+        String permissoesUsuario =
+                (leitura ? "r" : "-") +
+                        (escrita ? "w" : "-") +
+                        (execucao ? "x" : "-");
+
+        // Permissões fixas para grupo e outros (exemplo)
+        String permissoesGrupoOutros = "r--r--";
+
+        String permissoesSimbolicas = permissoesUsuario + permissoesGrupoOutros;
+
+        // Permissões octal
+        int octalUsuario = (leitura ? 4 : 0) + (escrita ? 2 : 0) + (execucao ? 1 : 0);
+        int octalGrupo = 4;  // r--
+        int octalOutros = 4;  // r--
+        String permissoesOctal = String.format("%d%d%d", octalUsuario, octalGrupo, octalOutros);
+
+        // Links
+        int links = 1;
+
+        // Grupo fixo
+        String grupo = "group";
+
+        // Datas formatadas (ano e hora)
+        String dataModificacao = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm").format(dataUltimaModificacao);
+        String dataAcesso = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm").format(dataUltimoAcesso);
+        String dataAlteracao = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm").format(dataAlteracaoMetadados);
+        String dataCriacaoStr = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm").format(dataCriacao);
+
+
+        System.out.printf(
+                "Tamanho: %-15d Blocos: %-10d Bloco IO: %-6d %s%n",
+                (int) tamanhoBytes,
+                (int) Math.ceil(((double) tamanhoBytes) / ((double) bloco)),
+                4096,
+                tipo
         );
 
-        System.out.println(
-                "Dispositivo: 802h/2050d" +
-                        "  Inode: " + inode +
-                        "  Links: 1"
+        System.out.printf(
+                "Inode: %-12d Links: %d%n",
+                inode,
+                links
         );
 
-        System.out.println(
-                "Acesso: (" + permissoesOctal + "/" + permissoesSimbolicas + ")" +
-                        "  UID: (1000/" + proprietario + ")" +
-                        "  GID: (1000/" + grupo + ")"
+        System.out.printf(
+                "Acesso: (%s/%s)  UID: (1000/%s)   GID: (1000/%s)%n",
+                permissoesOctal,
+                permissoesSimbolicas,
+                proprietario,
+                grupo
         );
 
+        System.out.println("Acesso:      " + dataAcesso);
+        System.out.println("Modificação: " + dataModificacao);
+        System.out.println("Alteração:   " + dataAlteracao);
+        System.out.println("Criação:     " + dataCriacaoStr);
 
-        System.out.println(
-                "Acesso: " + dataUltimoAcesso
-        );
-
-        System.out.println(
-                "Modificação: " + dataUltimaModificacao
-        );
-
-        System.out.println(
-                "Alteração: " + dataAlteracaoMetadados
-        );
-
-        System.out.println(
-                "Criação: " + dataCriacao
-        );
     }
     @Override
     public void du(String nomeDiretorio) {

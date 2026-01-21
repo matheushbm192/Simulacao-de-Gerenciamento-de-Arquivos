@@ -363,6 +363,15 @@ public class Terminal {
                     }
                     break;
 
+                case "pwd":
+                    if (comandos.length == 1) {
+                        // Mostra o caminho completo atual
+                        System.out.println(montarPrompt(caminho).replace("PS ", "").replace("> ", ""));
+                    } else {
+                        System.out.println("Argumentos inválidos (pwd)");
+                    }
+                    break;
+
                     default:
                     System.out.println("Comando inválido");
                     break;
