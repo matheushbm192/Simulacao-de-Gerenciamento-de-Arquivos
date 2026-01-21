@@ -26,6 +26,7 @@ public class Terminal {
 
             historico.add(comando);
 
+            //Ela faz um split especial por espaço mas ignora espaços que estejam dentro de aspas duplas
             String[] comandos = comando.split(" (?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
 
             switch (comandos[0]){
@@ -72,6 +73,7 @@ public class Terminal {
                 case "echo":
                     if (comandos.length == 4) {
 
+                        //remover apenas as aspas do começo e do fim, mantendo as que contém dentro
                         String texto = comandos[1].replaceAll("^\"|\"$", "");
                         String operador = comandos[2];
                         String arquivo = comandos[3];
@@ -137,7 +139,6 @@ public class Terminal {
                         }
                         // cd /
                         else if (comandos[1].equals("/")) {
-
                             caminho.clear();
                             caminho.add(root);
                             atual = root;

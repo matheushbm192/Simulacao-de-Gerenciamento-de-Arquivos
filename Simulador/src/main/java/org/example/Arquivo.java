@@ -160,9 +160,10 @@ public class Arquivo implements Comandos {
     }
 
 
-    //todo: não gostei dessa implementação, implementar a separação de linha  fuuramente
+    //
     public void textoIncrement(String textoIncrement) {
         StringBuilder textoAdicional = new StringBuilder();
+        //adicionando espaço ao final do conteúdo
         textoAdicional.append(" ").append(textoIncrement);
        texto += textoAdicional.toString() ;
 
@@ -177,10 +178,12 @@ public class Arquivo implements Comandos {
         int contador = 0;
 
         for (String palavra : palavras) {
+            //adiciona palavra e espaço
             textoTratado.append(palavra).append(" ");
             contador++;
 
             if (contador == palavrasPorLinha) {
+                //4 palavras da uma quebra de linha
                 textoTratado.append("\n");
                 contador = 0;
             }
@@ -201,7 +204,7 @@ public class Arquivo implements Comandos {
 
     @Override
     public void mkdir(String nomeDiretorio) {
-        System.out.println("Erro: arquivo não pode conter diretórios.");
+        comandoInvalido("mkdir");
 
     }
 

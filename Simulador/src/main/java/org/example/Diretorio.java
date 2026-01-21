@@ -164,11 +164,14 @@ public class Diretorio  implements Comandos,Cloneable {
 
     public  Comandos buscarPorPathParcial(String path, Comandos atual){
         String[] nomesDiretoriosArquivos = path.split("\\\\");
+        //recebe nome normal, sem path
         if(nomesDiretoriosArquivos.length == 1 ){
+            //cast de diretorioAtual
             if(atual instanceof Diretorio diretorioAtual){
                 return  diretorioAtual.buscarDiretorioArquivo(nomesDiretoriosArquivos[0]);
             }
-        }else{ //local/janta/documento.txt
+            //com path
+        }else{ // \local\janta\documento.txt
             for (int i = 1; i < nomesDiretoriosArquivos.length; i++) {
                 if(atual instanceof Diretorio diretorioAtual){
                     atual =  diretorioAtual.buscarDiretorioArquivo(nomesDiretoriosArquivos[i]);
@@ -182,7 +185,9 @@ public class Diretorio  implements Comandos,Cloneable {
     }
 
     public Comandos buscarDiretorioArquivo(String nomeDiretorioArquivo){
+        //passa por todos os indices de diretoriosArquivos
         for(Comandos diretorioArquivo : diretoriosArquivos ){
+            //procura comparando com o nome que foi passado
             if(nomeDiretorioArquivo.equals(diretorioArquivo.getNome())){
                 return diretorioArquivo;
             }
@@ -213,6 +218,7 @@ public class Diretorio  implements Comandos,Cloneable {
 
     @Override
     public void touch(String nomeArquivo) {
+        //verifica se algum ja possui esse nome
        Arquivo arquivo =  validarNomeArquivo(nomeArquivo,this);
         diretoriosArquivos.add(arquivo);
     }
@@ -236,14 +242,15 @@ public class Diretorio  implements Comandos,Cloneable {
 
     @Override
     public void tree() {
-        //this == atual (terminal)
+
         imprimirTree(this, 0);
 
     }
 
     private void imprimirTree(Diretorio dir, int nivel) {
-
-    // Indentação do nível atual
+        //dir é o diretório atual
+        // nivel é a profundidade na árvore 0 = raiz, 1 = filho...
+        //para cada nível imprime espaço, assim terá a separação bonitinha
         for (int i = 0; i < nivel; i++) {
             System.out.print("   ");
         }
@@ -256,9 +263,11 @@ public class Diretorio  implements Comandos,Cloneable {
             if (c instanceof Diretorio diretorio) {
                 imprimirTree(diretorio, nivel + 1);
             } else {
+                //chegou na folha, arquivo
                 for (int i = 0; i <= nivel; i++) {
                     System.out.print("   ");
                 }
+                //imprime arquivo
                 System.out.println("|-- " + c.getNome());
             }
         }
@@ -299,7 +308,7 @@ public class Diretorio  implements Comandos,Cloneable {
             return;
         }
 
-        // Arquivo já existe
+        //arquivo já existe
         if (diretorioArquivo instanceof Arquivo arquivo) {
 
             if (atributo.equals(">>")) {
@@ -309,12 +318,11 @@ public class Diretorio  implements Comandos,Cloneable {
             }
 
         }
-        // Arquivo NÃO existe → cria
+        //arquivo nao existe, ele cria
         else {
 
             Arquivo novo = validarNomeArquivo(nomeArquivo,this);
 
-            // tanto > quanto >> criam arquivo
             novo.escrever(texto);
             diretoriosArquivos.add(novo);
         }
@@ -378,6 +386,18 @@ public class Diretorio  implements Comandos,Cloneable {
         buscarRecursivo(this, nomeDiretorioArquivo, this.getNome());
     }
 
+    private void buscarRecursivo(Comandos atual, String nomeProcurado, String caminhoAtual) {
+        if (atual.getNome().equals(nomeProcurado)) {
+            System.out.println(caminhoAtual);
+        }
+
+        if(atual instanceof Diretorio diretorioAtual) {
+            for (Comandos c : diretorioAtual.getFilhos()) {
+                buscarRecursivo(c, nomeProcurado, caminhoAtual + "\\" + c.getNome());
+            }
+        }
+    }
+
     @Override
     public void grep(String termo) {
         System.out.println("grep: operação inválida para diretório");
@@ -408,12 +428,16 @@ public class Diretorio  implements Comandos,Cloneable {
 
     @Override
     public void du(String nomeDiretorio) {
+
         Comandos diretorioArquivo = buscarPorPathParcial(nomeDiretorio,this);
+
         if(diretorioArquivo instanceof Diretorio){
             int quantidadeBlocos = (int) getTamanhoBytes() / bloco;
             System.out.println(quantidadeBlocos + " blocos");
+
         } else if (diretorioArquivo instanceof Arquivo arquivo) {
             arquivo.du(nomeDiretorio);
+
         }else{
             System.out.println("Diretorio não foi encontrado");
         }
@@ -505,19 +529,7 @@ public class Diretorio  implements Comandos,Cloneable {
         }
     }
 
-    private void buscarRecursivo(Comandos atual, String nomeProcurado, String caminhoAtual) {
-        if (atual.getNome().equals(nomeProcurado)) {
-            System.out.println(caminhoAtual);
-        }
 
-        if(atual instanceof Diretorio diretorioAtual) {
-            for (Comandos c : diretorioAtual.getFilhos()) {
-                buscarRecursivo(c, nomeProcurado, caminhoAtual + "\\" + c.getNome());
-            }
-        }
-    }
-
-    //todo: setPermissoes precisa definir as permissoes em octal tambem
     public void setPermissoes(String permissaoSimbolica) {
 
         // Exemplo esperado: drwxr-xr-x
@@ -586,27 +598,26 @@ public class Diretorio  implements Comandos,Cloneable {
     private void printStat() {
             this.tamanhoBytes = getTamanhoBytes();
 
-            // Tipo (d para diretório, - para arquivo)
             String tipo = (this instanceof Diretorio) ? "d" : "-";
 
-            // Permissões simbólicas
+            //permissões simbolicas
             String permissoesUsuario =
                     (leitura ? "r" : "-") +
                             (escrita ? "w" : "-") +
                             (execucao ? "x" : "-");
 
-            // Permissões fixas para grupo e outros (exemplo)
+            //permissões fixas para grupo e outros, fixa
             String permissoesGrupoOutros = "r--r--";
 
             String permissoesSimbolicas = permissoesUsuario + permissoesGrupoOutros;
 
-            // Permissões octal
+            //permissões octal
             int octalUsuario = (leitura ? 4 : 0) + (escrita ? 2 : 0) + (execucao ? 1 : 0);
-            int octalGrupo = 4;  // r--
-            int octalOutros = 4;  // r--
+            int octalGrupo = 4; //r--
+            int octalOutros = 4; //r--
             String permissoesOctal = String.format("%d%d%d", octalUsuario, octalGrupo, octalOutros);
 
-            // Links
+            //links
             int links = (this instanceof Diretorio) ? diretoriosArquivos.size() + 2 : 1;
 
             // Grupo fixo
@@ -702,6 +713,7 @@ public class Diretorio  implements Comandos,Cloneable {
     public void unzip(String nomeZip) {
         Comandos item = buscarPorPathParcial(nomeZip,this);
 
+        //verifica se esse arquivo existe
         if (!(item instanceof Arquivo)) {
             System.out.println("unzip: arquivo não encontrado");
             return;
@@ -714,7 +726,8 @@ public class Diretorio  implements Comandos,Cloneable {
             return;
         }
 
-        // Cria diretório de descompactação
+        //cria diretório de descompactação
+            //tirando .zip do nome
         String nomePasta = nomeZip.replace(".zip", "");
         Diretorio pasta = validarNomeDiretorio(nomePasta,item.getDiretorioPai());
         item.getDiretorioPai().diretoriosArquivos.add(pasta);
