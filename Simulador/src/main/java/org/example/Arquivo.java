@@ -1,5 +1,7 @@
 package org.example;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -219,6 +221,11 @@ public class Arquivo implements Comandos {
 
     @Override
     public void cat(String nomeArquivo) {
+        if (texto == null || texto.isBlank()) {
+            System.out.println(nomeArquivo + ": arquivo vazio");
+            return;
+        }
+
         System.out.println(texto);
     }
 
@@ -289,7 +296,7 @@ public class Arquivo implements Comandos {
 
     @Override
     public void wc(String nomeArquivo) {
-        System.out.println("linhas: " +countLinhas());
+        System.out.println("linhas: " + countLinhas());
         System.out.println("palavras: " + countPalavras());
         System.out.println("caracteres: " + countCaracteres());
 
@@ -301,21 +308,29 @@ public class Arquivo implements Comandos {
         execucao = permissao.contains("x");
     }
 
-    private int countLinhas(){
-        String textoComQuebraLinha = adicionaQuebraLinha(texto);
-        String[] textoSeparadoPorLinha = textoComQuebraLinha.split("\n");
-        return textoSeparadoPorLinha.length;
+    private int countLinhas() {
+        if (texto == null || texto.isBlank()) {
+            return 0;
+        }
+
+        return texto.split("\n").length;
+    }
+    private int countPalavras() {
+        if (texto == null || texto.isBlank()) {
+            return 0;
+        }
+
+        return texto.trim().split("\\s+").length;
     }
 
-    private int countPalavras(){
-        String[] palavras = texto.split(" ");
-        return palavras.length;
+    private int countCaracteres() {
+        if (texto == null || texto.isEmpty()) {
+            return 0;
+        }
+
+        return texto.length();
     }
 
-    private int countCaracteres(){
-        String[] caracteres = texto.split("");
-        return caracteres.length;
-    }
 
     @Override
     public void find(String nomeDiretorioArquivo) {
@@ -323,7 +338,6 @@ public class Arquivo implements Comandos {
         System.out.println("Erro: find deve ser executado em um diretório.");
     }
 
-    // todo: criar para diretório também? mesmo que seja inválido?
     public void grep(String termo) {
 
         if (!leitura) {
@@ -339,8 +353,7 @@ public class Arquivo implements Comandos {
 
         for (int i = 0; i < linhas.length; i++) {
             if (linhas[i].contains(termo)) {
-                System.out.println(
-                        getNome() + ":" + (i + 1) + ": " + linhas[i]
+                System.out.println("linha " + (i + 1) + ": " + linhas[i]
                 );
             }
         }
@@ -485,21 +498,33 @@ public class Arquivo implements Comandos {
 
     public String detalhes() {
 
-        String tipo = "-";
+        String tipo = "-"; // ou "d" se for diretório
+
         String permissoes =
                 (leitura ? "r" : "-") +
                         (escrita ? "w" : "-") +
-                        (execucao ? "x" : "-");
+                        (execucao ? "x" : "-") +
+                        "r--r--"; // grupo + outros (exemplo fixo)
+
+        int links = 1;
+        String grupo = "group";
+
+        String data = LocalDateTime.now()
+                .format(DateTimeFormatter.ofPattern("MMM dd HH:mm"));
 
         return String.format(
-                "%s%s  %s  %d  %s",
+                "%s%s  %d  %s  %s  %5d  %s  %s",
                 tipo,
                 permissoes,
+                links,
                 proprietario,
+                grupo,
                 (int) tamanhoBytes,
+                data,
                 nome
         );
     }
+
 
     // todo: usar esse método depois onde os comandos são inválidos para arquivo, vai facilitar
     private void comandoInvalido(String comando) {

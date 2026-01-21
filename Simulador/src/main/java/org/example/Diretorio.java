@@ -219,7 +219,6 @@ public class Diretorio  implements Comandos,Cloneable {
          }
     }
 
-    //todo:rever implemntação
     @Override
     public void echo(String texto, String atributo, String nomeArquivo) {
 
@@ -337,7 +336,7 @@ public class Diretorio  implements Comandos,Cloneable {
         Comandos diretorioArquivo = buscarDiretorioArquivo(nomeDiretorio);
         if(diretorioArquivo instanceof Diretorio){
             int quantidadeBlocos = (int) getTamanhoBytes() / bloco;
-            System.out.println(quantidadeBlocos + "blocos");
+            System.out.println(quantidadeBlocos + " blocos");
         } else if (diretorioArquivo instanceof Arquivo arquivo) {
             arquivo.du(nomeDiretorio);
         }else{
