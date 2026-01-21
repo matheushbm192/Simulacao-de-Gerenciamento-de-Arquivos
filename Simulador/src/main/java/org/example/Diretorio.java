@@ -634,44 +634,54 @@ public class Diretorio  implements Comandos,Cloneable {
 
     @Override
     public void zip(String nomeZip, ArrayList<String> itens) {
-        if (!nomeZip.endsWith(".zip")) {
-            System.out.println("Erro: arquivo zip deve terminar com .zip");
-            return;
-        }
 
-        Arquivo zip = new Arquivo(nomeZip, this);
-        int itensAdicionados = 0;
+            if (!nomeZip.endsWith(".zip")) {
+                System.out.println("Erro: arquivo zip deve terminar com .zip");
+                return;
+            }
 
-        for (String nomeItem : itens) {
+            Arquivo zip = new Arquivo(nomeZip, this);
+            int itensAdicionados = 0;
+            int erros = 0;
 
-            boolean encontrado = false;
+            for (String nomeItem : itens) {
 
-            for (Comandos c : diretoriosArquivos) {
+                boolean encontrado = false;
 
-                if (c.getNome().equals(nomeItem)) {
-                    zip.adicionarAoZip(c);
-                    itensAdicionados++;
-                    encontrado = true;
-                    break;
+                for (Comandos c : diretoriosArquivos) {
+                    if (c.getNome().equals(nomeItem)) {
+                        zip.adicionarAoZip(c);
+                        itensAdicionados++;
+                        encontrado = true;
+                        break;
+                    }
+                }
+
+                if (!encontrado) {
+                    System.out.println("Aviso: item '" + nomeItem + "' não encontrado");
+                    erros++;
                 }
             }
 
-            if (!encontrado) {
-                System.out.println("Aviso: item '" + nomeItem + "' não encontrado");
+            // nenhum válido
+            if (itensAdicionados == 0) {
+                System.out.println("zip: nenhum item válido para compactar");
+                return;
             }
+
+            // houve erro em algum item
+            if (erros > 0) {
+                System.out.println("zip: operação cancelada devido a itens inválidos");
+                return;
+            }
+
+            diretoriosArquivos.add(zip);
+            System.out.println("Arquivo " + nomeZip + " criado com sucesso.");
         }
 
-        if (itensAdicionados == 0) {
-            System.out.println("zip: nenhum item válido para compactar");
-            return;
-        }
 
-        diretoriosArquivos.add(zip);
-        System.out.println("Arquivo " + nomeZip + " criado com sucesso.");
 
-    }
-
-    @Override
+        @Override
     public void unzip(String nomeZip) {
         Comandos item = buscarPorPathParcial(nomeZip,this);
 
