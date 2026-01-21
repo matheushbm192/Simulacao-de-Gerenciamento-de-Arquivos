@@ -24,6 +24,8 @@ public class Terminal {
 
             String comando = entrada.nextLine();
 
+            historico.add(comando);
+
             String[] comandos = comando.split(" (?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
 
             switch (comandos[0]){
@@ -68,10 +70,16 @@ public class Terminal {
                     break;
 
                 case "echo":
-                    if(comandos.length == 4) {
-                        atual.echo(comandos[1], comandos[2], comandos[3].replace("\"", ""));
-                    }else {
-                        System.out.println("Argumentos Inválidos (echo <texto> >|>> <arquivo>)");
+                    if (comandos.length == 4) {
+
+                        String texto = comandos[1].replaceAll("^\"|\"$", "");
+                        String operador = comandos[2];
+                        String arquivo = comandos[3];
+
+                        atual.echo(texto, operador, arquivo);
+
+                    } else {
+                        System.out.println("Argumentos Inválidos (echo \"texto\" >|>> arquivo)");
                     }
                     break;
 
@@ -265,16 +273,15 @@ public class Terminal {
                     if (comandos.length == 2 && comandos[1].equals("-l")) {
 
                         for (Comandos c : atual.getFilhos()) {
-
-                            if (c instanceof Arquivo) {
-                                System.out.println(((Arquivo) c).detalhes());
-                            } else if (c instanceof Diretorio) {
-                                System.out.println(((Diretorio) c).detalhes());
+                            if (atual.getFilhos().isEmpty()) {
+                                System.out.println("(diretório vazio)");
+                                break;
                             }
+                            System.out.println(c.detalhes());
                         }
 
-                    }else {
-                        System.out.println("Argumentos Inválidos (ls -l)");
+                    } else {
+                        System.out.println("Argumentos inválidos (ls -l)");
                     }
                     break;
                 case "du":
